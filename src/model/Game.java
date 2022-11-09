@@ -18,6 +18,37 @@ public class Game {
         this.lose = false;
     }
 
+    public boolean playLetter(String letter) {
+        if (playedLetters.contains(letter)) {
+            return false;
+        }
+        playedLetters.add(letter);
+        if (!secretWord.contains(letter)) {
+            tries++;
+            if (tries == 10) {
+                lose = true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public String generateWordWithLettersFound() {
+        String word = "";
+        if (lose) {
+            return secretWord;
+        } else {
+            for (int i = 0; i < secretWord.length(); i++) {
+                if (playedLetters.contains(secretWord.substring(i, i + 1))) {
+                    word += secretWord.substring(i, i + 1);
+                } else {
+                    word += "_";
+                }
+            }
+        }
+        return word;
+    }
+
     public String getSecretWord() {
         return secretWord;
     }
