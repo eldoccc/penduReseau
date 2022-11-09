@@ -1,4 +1,4 @@
-package src.test;
+package test;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,11 +11,11 @@ public class testS {
             int portServer = 9111;
             ServerSocket serveur = new ServerSocket(portServer);
 
-            System.out.println("Serveur de majuscule créé "+serveur);
+            System.out.println("Serveur de majuscule créé " + serveur);
             int noClient = 0;
-            while (true){
+            while (true) {
                 Socket socket = serveur.accept();
-                System.out.println("Connexion réussie avec le client n°"+noClient);
+                System.out.println("Connexion réussie avec le client n°" + noClient);
 
                 Interlocuteur interlocuteur = new Interlocuteur(socket, noClient);
                 noClient++;

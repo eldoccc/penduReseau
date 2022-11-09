@@ -1,4 +1,4 @@
-package src.test;
+package test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-public class Interlocuteur extends Thread{
+public class Interlocuteur extends Thread {
 
     BufferedReader fluxEntrant;
     PrintStream fluxSortant;
@@ -18,11 +18,11 @@ public class Interlocuteur extends Thread{
     }
 
     @Override
-    public void run(){
+    public void run() {
         try {
-            while (!Thread.interrupted()){
+            while (!Thread.interrupted()) {
                 String requete = fluxEntrant.readLine();
-                System.out.println("Le client n°"+this.noClient+" a envoyé : "+requete);
+                System.out.println("Le client n°" + this.noClient + " a envoyé : " + requete);
                 String reponse = requete.toUpperCase();
                 this.fluxSortant.println(reponse);
             }

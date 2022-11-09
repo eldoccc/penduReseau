@@ -1,4 +1,4 @@
-package src.model;
+package model;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,16 +22,16 @@ public class Game {
         return secretWord;
     }
 
+    public void setSecretWord(String secretWord) {
+        this.secretWord = secretWord;
+    }
+
     public boolean isLose() {
         return lose;
     }
 
     public void setLose(boolean lose) {
         this.lose = lose;
-    }
-
-    public void setSecretWord(String secretWord) {
-        this.secretWord = secretWord;
     }
 
     public int getTries() {
@@ -68,13 +68,13 @@ public class Game {
                 '}';
     }
 
-    public int amountOfPlayedLetters(){
+    public int amountOfPlayedLetters() {
         return this.playedLetters.size();
     }
 
-    public void wrongLetter(String letter){
+    public void wrongLetter(String letter) {
         this.playedLetters.add(letter);
-        if(this.tries == amountOfPlayedLetters()) lose = true;
+        if (this.tries == amountOfPlayedLetters()) lose = true;
     }
 }
 
