@@ -6,7 +6,8 @@ import java.util.ArrayList;
 public class Game {
     private String secretWord;
     private int tries;
-    private ArrayList<String> playedLetters;
+    private ArrayList<String> rightPlayedLetters;
+    private ArrayList<String> wrongPlayedLetters;
     private Socket client;
     private boolean lose;
 
@@ -14,7 +15,9 @@ public class Game {
         this.secretWord = secretWord;
         this.tries = 0;
         this.client = client;
-        this.playedLetters = new ArrayList<>();
+        this.rightPlayedLetters = new ArrayList<>();
+        this.wrongPlayedLetters = new ArrayList<>();
+
         this.lose = false;
     }
 
@@ -26,13 +29,13 @@ public class Game {
      4 = letter not match
     */
     public int playLetter(String letter) {
-        if (playedLetters.contains(letter)) {
+        if (rightPlayedLetters.contains(letter.toLowerCase())) {
             return 0;
         }
-        playedLetters.add(letter);
-        if (!secretWord.contains(letter)) {
-            tries++;
-            if (tries == 10) {
+        //playedLetters.add(letter);
+        if (!secretWord.toLowerCase().contains(letter.toLowerCase())) {
+            wrongPlayedLetters.add(letter.toLowerCase());
+            if (tries == wrongPlayedLetters.size()) {
                 lose = true;
                 return 2;
             }
@@ -41,6 +44,7 @@ public class Game {
         if (generateWordWithLettersFound().equals(secretWord)) {
             return 3;
         }
+        rightPlayedLetters.add(letter.toLowerCase());
         return 1;
     }
 
@@ -50,7 +54,7 @@ public class Game {
             return secretWord;
         } else {
             for (int i = 0; i < secretWord.length(); i++) {
-                if (playedLetters.contains(secretWord.substring(i, i + 1))) {
+                if (rightPlayedLetters.contains(secretWord.toLowerCase().substring(i, i + 1))) {
                     word += secretWord.substring(i, i + 1);
                 } else {
                     word += "_";
@@ -84,12 +88,20 @@ public class Game {
         this.tries = tries;
     }
 
-    public ArrayList<String> getPlayedLetters() {
-        return playedLetters;
+    public ArrayList<String> getRightPlayedLetters() {
+        return rightPlayedLetters;
     }
 
-    public void setPlayedLetters(ArrayList<String> playedLetters) {
-        this.playedLetters = playedLetters;
+    public void setRightPlayedLetters(ArrayList<String> rightPlayedLetters) {
+        this.rightPlayedLetters = rightPlayedLetters;
+    }
+
+    public ArrayList<String> getWrongPlayedLetters() {
+        return wrongPlayedLetters;
+    }
+
+    public void setWrongPlayedLetters(ArrayList<String> wrongPlayedLetters) {
+        this.wrongPlayedLetters = wrongPlayedLetters;
     }
 
     public Socket getClient() {
@@ -105,18 +117,33 @@ public class Game {
         return "Game{" +
                 "secretWord='" + secretWord + '\'' +
                 ", tries=" + tries +
-                ", playedLetters=" + playedLetters +
+                ", rightPlayedLetters=" + rightPlayedLetters +
+                ", wrongPlayedLetters=" + wrongPlayedLetters +
                 ", client=" + client +
+                ", lose=" + lose +
                 '}';
     }
 
-    public int amountOfPlayedLetters() {
-        return this.playedLetters.size();
+    public int amountOfWrongPlayedLetters() {
+        return this.wrongPlayedLetters.size();
     }
 
-    public void wrongLetter(String letter) {
-        this.playedLetters.add(letter);
-        if (this.tries == amountOfPlayedLetters()) lose = true;
+    public void setDifficulty(int difficulty){
+        switch (difficulty) {
+            case 1 :
+                this.tries = 10;
+                break;
+            case 2 :
+                this.tries = 6;
+                break;
+            case 3:
+                this.tries = 4;
+                break;
+            default:
+                this.tries = 10;
+                break;
+
+        }
     }
 }
 

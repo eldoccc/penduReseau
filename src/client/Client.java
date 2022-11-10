@@ -12,13 +12,29 @@ public class Client {
         Response response = null;
         System.out.println("Salut à toi JOUEUR1, bienvenue sur le jeu du pendu ! \n");
         BufferedReader clavier = new BufferedReader(new InputStreamReader(System.in));
-        Socket socket = new Socket("192.168.169.205", 1234);
+        Socket socket = new Socket("100.66.49.176", 1234);
         //BufferedReader inFlux = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ObjectInputStream inFlux = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
         PrintStream outFlux = new PrintStream(socket.getOutputStream());
 
+        System.out.println("En quelle difficulté veux-tu jouer ? (facile, normal ou difficile)");
+        requete = clavier.readLine();
+        switch (requete){
+            case "facile":
+                outFlux.println(1);
+                break;
+            case "normal":
+                outFlux.println(2);
+                break;
+            case "difficile":
+                outFlux.println(3);
+                break;
+        }
+
         boolean quit = false;
         do {
+
+
             System.out.println("Tapes la lettre à envoyer au serveur ou quittes la conversation avec \"quitter\" \n");
             requete = clavier.readLine().trim();
 
