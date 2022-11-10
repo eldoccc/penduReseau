@@ -18,19 +18,30 @@ public class Game {
         this.lose = false;
     }
 
-    public boolean playLetter(String letter) {
+    /*
+     0 = already use
+     1 = letter match
+     2 = lose
+     3 = win
+     4 = letter not match
+    */
+    public int playLetter(String letter) {
         if (playedLetters.contains(letter)) {
-            return false;
+            return 0;
         }
         playedLetters.add(letter);
         if (!secretWord.contains(letter)) {
             tries++;
             if (tries == 10) {
                 lose = true;
+                return 2;
             }
-            return false;
+            return 4;
         }
-        return true;
+        if (generateWordWithLettersFound().equals(secretWord)) {
+            return 3;
+        }
+        return 1;
     }
 
     public String generateWordWithLettersFound() {

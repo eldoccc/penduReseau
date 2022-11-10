@@ -1,9 +1,17 @@
 package model;
 
-public class Response {
+import java.io.Serializable;
+
+public class Response implements Serializable {
     private int triesLeft;
     private String hiddenWord;
-    private int stateGame; // 0 = wrong letter, 1 = right letter, 3 = win, 4 = lose
+    private int stateGame;     /*
+     0 = already use
+     1 = letter match
+     2 = lose
+     3 = win
+     4 = letter not match
+    */
 
     public Response(int triesLeft, String hiddenWord, int stateGame) {
         this.triesLeft = triesLeft;

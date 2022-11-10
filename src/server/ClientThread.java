@@ -24,46 +24,34 @@ public class ClientThread implements Runnable {
 
             this.game = new Game("Hemdoulila", clientSocket);
             this.run();
+
+            System.out.println("End of thread");
         } catch (java.io.IOException e) {
             System.out.println("Error in ClientThread: " + e);
         }
     }
 
-    @Override
     public void run() {
-        // Send the word to guess
-        out.println(game.getSecretWord());
-
         while (!game.isLose() || clientSocket.isClosed()) {
             // Receive a letter from the client
             String letter = "";
-            while (letter.length() != 1) {
-                try {
+            try {
+                while (letter.length() != 1) {
                     letter = in.readLine();
-                } catch (java.io.IOException e) {
-                    System.out.println("Error in ClientThread: " + e);
                 }
+            } catch (Exception e) {
+                return;
             }
 
-            Response response = new Response(game.getTries() - game.amountOfPlayedLetters(), game.generateWordWithLettersFound(), -1);
-
-            if (this.game.playLetter(letter)) {
-                response.setStateGame(1);
-            } else {
-                response.setStateGame(0);
-            }
-
-            if (game.isLose()) {
-                response.setStateGame(2);
-            } else if (game.generateWordWithLettersFound().equals(game.getSecretWord())) {
-                response.setStateGame(3);
-            }
+            // Play the letter
+            int stateRound = this.game.playLetter(letter);
+            Response response = new Response(game.getTries() - game.amountOfPlayedLetters(), game.generateWordWithLettersFound(), stateRound);
 
             // Send the word with the letters found
             try {
                 oos.writeObject(response);
             } catch (java.io.IOException e) {
-                System.out.println("Error in ClientThread: " + e);
+                return;
             }
         }
     }

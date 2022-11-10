@@ -12,7 +12,7 @@ public class Client {
         Response response = null;
         System.out.println("Salut à toi JOUEUR1, bienvenue sur le jeu du pendu ! \n");
         BufferedReader clavier = new BufferedReader(new InputStreamReader(System.in));
-        Socket socket = new Socket("localhost", 1234);
+        Socket socket = new Socket("192.168.169.205", 1234);
         //BufferedReader inFlux = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ObjectInputStream inFlux = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
         PrintStream outFlux = new PrintStream(socket.getOutputStream());
@@ -27,28 +27,25 @@ public class Client {
             } else {
                 outFlux.println(requete);
                 response = (Response) inFlux.readObject();
-                switch (response.getStateGame()) {
-                    case 0:
-                        System.out.println("mauvaise lettre, essais restants" + response.getTriesLeft() + " : \n" + response.getHiddenWord());
-                        break;
-
-                    case 1:
-                        System.out.println("bonne lettre , essais restants" + response.getTriesLeft() + " \n" + response.getHiddenWord());
-                        break;
-
-                    case 2:
-                        System.out.println("La lettre est dans le mot et tu as gagné");
-                        quit = true;
-                        break;
-                    case 4:
-                        System.out.println("La lettre n'est pas dans le mot et tu as perdu. Le mot était : " + response.getHiddenWord());
-                        quit = true;
-                        break;
+                System.out.println("Tentatives restantes : " + response.getTriesLeft());
+                System.out.println("Mot à trouver : " + response.getHiddenWord());
+                if (response.getStateGame() == 0) {
+                    System.out.println("La lettre a déjà été jouée");
+                } else if (response.getStateGame() == 1) {
+                    System.out.println("La lettre est dans le mot");
+                } else if (response.getStateGame() == 2) {
+                    System.out.println("Vous avez perdu");
+                    quit = true;
+                } else if (response.getStateGame() == 3) {
+                    System.out.println("Vous avez gagné");
+                    quit = true;
+                } else if (response.getStateGame() == 4) {
+                    System.out.println("La lettre n'est pas dans le mot");
                 }
-
-
             }
         } while (!quit);
+
+        socket.close();
 
     }
 
