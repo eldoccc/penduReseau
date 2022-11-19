@@ -12,7 +12,7 @@ public class Client {
         Response response = null;
         System.out.println("Salut à toi JOUEUR1, bienvenue sur le jeu du pendu ! \n");
         BufferedReader clavier = new BufferedReader(new InputStreamReader(System.in));
-        Socket socket = new Socket("100.66.49.176", 1234);
+        Socket socket = new Socket("localhost", 1234);
         //BufferedReader inFlux = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ObjectInputStream inFlux = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
         PrintStream outFlux = new PrintStream(socket.getOutputStream());

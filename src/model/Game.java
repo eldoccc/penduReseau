@@ -12,7 +12,7 @@ public class Game {
     private boolean lose;
 
     public Game(String secretWord, Socket client) {
-        this.secretWord = secretWord;
+        this.secretWord = secretWord.toLowerCase();
         this.tries = 0;
         this.client = client;
         this.rightPlayedLetters = new ArrayList<>();
@@ -29,22 +29,24 @@ public class Game {
      4 = letter not match
     */
     public int playLetter(String letter) {
-        if (rightPlayedLetters.contains(letter.toLowerCase())) {
+        letter = letter.toLowerCase();
+        if (rightPlayedLetters.contains(letter)) {
             return 0;
         }
         //playedLetters.add(letter);
-        if (!secretWord.toLowerCase().contains(letter.toLowerCase())) {
-            wrongPlayedLetters.add(letter.toLowerCase());
+        if (!secretWord.toLowerCase().contains(letter)) {
+            wrongPlayedLetters.add(letter);
             if (tries == wrongPlayedLetters.size()) {
                 lose = true;
                 return 2;
             }
             return 4;
         }
+        rightPlayedLetters.add(letter);
         if (generateWordWithLettersFound().equals(secretWord)) {
             return 3;
         }
-        rightPlayedLetters.add(letter.toLowerCase());
+
         return 1;
     }
 

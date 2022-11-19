@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Wording {
     ArrayList<String> words;
-    File myObj = new File("model/words.txt");
+    File myObj = new File("C:\\Users\\remiz\\OneDrive\\UNI\\Semestre 7\\Réseaux\\TP2\\penduReseau\\src\\resources\\words.txt");
     Scanner myReader;
 
     public Wording(){

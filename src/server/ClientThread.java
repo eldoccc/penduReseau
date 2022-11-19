@@ -4,24 +4,34 @@ import model.Game;
 import model.Response;
 import model.Wording;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
-public class ClientThread implements Runnable {
+public class ClientThread extends Thread {
     private Socket clientSocket;
     private Game game;
     private BufferedReader in;
     private PrintStream out;
     private ObjectOutputStream oos;
     private Wording wording;
+    private ArrayList<ClientThread> clientThreads;
 
-    public ClientThread(Socket clientSocket) {
+    public ClientThread(Socket clientSocket, ArrayList<ClientThread> clientThreads, int i) throws FileNotFoundException {
         this.clientSocket = clientSocket;
-        try {
-            this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
+        this.clientThreads = clientThreads;
+        if (i == 0) {
+            java.io.File file = new java.io.File("message.txt");
+            java.io.PrintWriter output = new java.io.PrintWriter(file);
+            try {
+                //Test the clientThread sync with the new clients
+                output.println(this.clientThreads.size());
+                while (true) {
+                    output.println(this.clientThreads.size());
+                    Thread.sleep(1000);
+                }
+
+            /*this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintStream(clientSocket.getOutputStream());
             this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
             this.wording = new Wording();
@@ -32,22 +42,22 @@ public class ClientThread implements Runnable {
 
             this.run();
 
-            System.out.println("End of thread");
-        } catch (java.io.IOException e) {
-            System.out.println("Error in ClientThread: " + e);
+            System.out.println("End of thread");*/
+            } catch (InterruptedException e) {
+                output.println("Error in ClientThread: " + e);
+                e.printStackTrace();
+            }
         }
     }
 
     public void run() {
+        try {
+            game.setDifficulty(Integer.parseInt(in.readLine()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         while (!game.isLose() || clientSocket.isClosed()) {
-            if(game.getTries() == 0){
-                try {
-                    game.setDifficulty(Integer.parseInt(in.readLine()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
             // Receive a letter from the client
             String letter = "";
@@ -70,5 +80,9 @@ public class ClientThread implements Runnable {
                 return;
             }
         }
+    }
+
+    public String getSecretWord() {
+        return this.game.getSecretWord();
     }
 }
