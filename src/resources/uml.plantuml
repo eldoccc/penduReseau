@@ -1,0 +1,40 @@
+@startuml
+
+interface Command{
+  +executer : void {}
+}
+
+abstract CommandInGame implements Command {
+
+}
+
+abstract CommandInMenu implements Command {
+
+}
+abstract CommandInQueue implements Command {
+
+}
+
+class JouerLettre extends CommandInGame {}
+
+class Rejouer extends CommandInGame {}
+class QuitterPartie extends CommandInGame {}
+
+class JouerPVP extends CommandInMenu {}
+class JouerPVE extends CommandInMenu {}
+class QuitterApp extends CommandInMenu {}
+class ChangeDifficulte extends CommandInMenu {}
+
+class ChoisirAdversaire extends CommandInQueue {}
+class Accepter extends CommandInQueue {}
+class Refuser extends CommandInQueue {}
+
+
+
+
+
+
+
+
+
+@enduml
