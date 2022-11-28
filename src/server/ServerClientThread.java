@@ -2,52 +2,57 @@ package server;
 
 import model.Game;
 import model.Response;
+import model.Response2;
 import model.Wording;
+import model.states.Etat;
+import model.states.Menu;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientThread extends Thread {
+public class ServerClientThread extends Thread {
+    private String name;
     private Socket clientSocket;
-    private Game game;
     private BufferedReader in;
     private PrintStream out;
     private ObjectOutputStream oos;
+    private ObjectInputStream ois;
+    private ArrayList<ServerClientThread> serverClientThreads;
+    private Etat state;
+
+    private Game game;
     private Wording wording;
-    private ArrayList<ClientThread> clientThreads;
 
-    public ClientThread(Socket clientSocket, ArrayList<ClientThread> clientThreads, int i) throws FileNotFoundException {
+
+    public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> otherClients) {
         this.clientSocket = clientSocket;
-        this.clientThreads = clientThreads;
-        if (i == 0) {
-            java.io.File file = new java.io.File("message.txt");
-            java.io.PrintWriter output = new java.io.PrintWriter(file);
-            try {
-                //Test the clientThread sync with the new clients
-                output.println(this.clientThreads.size());
-                while (true) {
-                    output.println(this.clientThreads.size());
-                    Thread.sleep(1000);
-                }
-
-            /*this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
+        this.serverClientThreads = otherClients;
+        try {
+            this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
+            this.ois = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new PrintStream(clientSocket.getOutputStream());
             this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            this.wording = new Wording();
-            // test area
-            this.game = new Game(wording.getRandomWord(), clientSocket);
-            //this.game.setTries(14);
-            // end of test area
 
-            this.run();
+            // Get the player name
+            this.name = in.readLine();
+            System.out.println("Player " + this.name + " connected");
 
-            System.out.println("End of thread");*/
-            } catch (InterruptedException e) {
-                output.println("Error in ClientThread: " + e);
-                e.printStackTrace();
-            }
+            this.changeState(new Menu());
+
+            // Init the player to the menu and also confirm the connection
+            this.oos.writeObject(new Response2("Welcome to the game " + this.name, this.state));
+
+            //this.run();
+
+            System.out.println("End of thread");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void changeState(Etat state) {
+        this.state = state;
     }
 
     public void run() {

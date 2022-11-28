@@ -1,69 +1,46 @@
 package client;
 
 import model.Response;
+import model.command.QuitCommand;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Client {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        String requete = "";
-        Response response = null;
-        System.out.println("Salut à toi JOUEUR1, bienvenue sur le jeu du pendu ! \n");
-        BufferedReader clavier = new BufferedReader(new InputStreamReader(System.in));
-        Socket socket = new Socket("localhost", 1234);
-        //BufferedReader inFlux = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        ObjectInputStream inFlux = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-        PrintStream outFlux = new PrintStream(socket.getOutputStream());
+        Socket clientSocket;
+        BufferedReader in_keyboard;
 
-        System.out.println("En quelle difficulté veux-tu jouer ? (facile, normal ou difficile)");
-        requete = clavier.readLine();
-        switch (requete){
-            case "facile":
-                outFlux.println(1);
-                break;
-            case "normal":
-                outFlux.println(2);
-                break;
-            case "difficile":
-                outFlux.println(3);
-                break;
+        // Get the adresse ip and the port with args
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
+
+        // Ask for the player name
+        in_keyboard = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter your name: ");
+        String name = in_keyboard.readLine();
+        System.out.println("");
+
+        // Create the socket
+        clientSocket = new Socket(ip, port);
+
+
+        // Create the Client Thread for listen the server
+        ClientThread clientThread = new ClientThread(clientSocket, name);
+        clientThread.start();
+
+        // Create the infite loop to record the console input
+        String command = "";
+        while (!Objects.equals(command, QuitCommand.QUIT_COMMAND_PUBLIC)) {
+            command = in_keyboard.readLine();
+            clientThread.send(command);
         }
 
-        boolean quit = false;
-        do {
+        clientThread.end();
 
-
-            System.out.println("Tapes la lettre à envoyer au serveur ou quittes la conversation avec \"quitter\" \n");
-            requete = clavier.readLine().trim();
-
-            if (requete.equalsIgnoreCase("quitter")) {
-                quit = true;
-            } else {
-                outFlux.println(requete);
-                response = (Response) inFlux.readObject();
-                System.out.println("Tentatives restantes : " + response.getTriesLeft());
-                System.out.println("Mot à trouver : " + response.getHiddenWord());
-                if (response.getStateGame() == 0) {
-                    System.out.println("La lettre a déjà été jouée");
-                } else if (response.getStateGame() == 1) {
-                    System.out.println("La lettre est dans le mot");
-                } else if (response.getStateGame() == 2) {
-                    System.out.println("Vous avez perdu");
-                    quit = true;
-                } else if (response.getStateGame() == 3) {
-                    System.out.println("Vous avez gagné");
-                    quit = true;
-                } else if (response.getStateGame() == 4) {
-                    System.out.println("La lettre n'est pas dans le mot");
-                }
-            }
-        } while (!quit);
-
-        socket.close();
-
+        // Confirm the end of the client
+        System.out.println("End of client");
     }
-
-
 }
