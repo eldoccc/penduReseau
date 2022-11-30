@@ -1,7 +1,7 @@
 package model.command;
 
 public class ChangeDifficultyCommand extends BaseCommand {
-    private static final String COMMAND = "difficulty";
+    private static final String COMMAND = "/difficulty";
 
     public ChangeDifficultyCommand(String command, String[] args) {
         super(command, args);

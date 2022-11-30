@@ -1,23 +1,26 @@
 package model.command;
 
 public class GuessWordCommand extends BaseCommand{
+
+    private static final String COMMAND = "/guess";
+
     public GuessWordCommand(Command next) {
         super(next);
     }
 
     @Override
     public String getUsage() {
-        return null;
+        return COMMAND + " <word>";
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Guess the word";
     }
 
     @Override
     public String getExample() {
-        return null;
+        return COMMAND + " telephone";
     }
 
     @Override
@@ -26,7 +29,13 @@ public class GuessWordCommand extends BaseCommand{
     }
 
     @Override
-    public boolean isValid(String command) {
-        return false;
+    public void run() {
+
     }
+
+    @Override
+    public boolean isValid() {
+        return this.command.equals(COMMAND) && this.args.length == 1 && this.args[0].length() > 1;
+    }
+
 }

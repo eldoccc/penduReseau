@@ -1,6 +1,6 @@
 package server;
 
-import model.Game;
+import model.game.Game;
 import model.Response;
 import model.Response2;
 import model.Wording;

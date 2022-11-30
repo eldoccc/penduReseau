@@ -1,6 +1,9 @@
 package model.states;
 
 import model.command.BaseCommand;
+import model.command.RestartCommand;
+import model.command.ReturnToMenuCommand;
+import model.command.SendMessageToOtherPlayerCommand;
 
 public class EndGame extends Etat {
 
@@ -10,6 +13,10 @@ public class EndGame extends Etat {
 
     public EndGame() {
         super();
+        this.restartCommand = new RestartCommand(this.quitCommand);
+        this.returnToMenuCommand = new ReturnToMenuCommand(this.restartCommand);
+        this.sendMessageToOtherPlayerCommand = new SendMessageToOtherPlayerCommand(this.returnToMenuCommand);
+        this.command_available = sendMessageToOtherPlayerCommand;
     }
 
     @Override

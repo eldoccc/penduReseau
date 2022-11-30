@@ -26,7 +26,7 @@ public class InGame extends Etat {
         this.sendLetterCommand = new SendLetterCommand(this.quitCommand);
         this.sendMessageToOtherPlayerCommand = new SendLetterCommand(this.sendLetterCommand);
         this.guessWordCommand = new SendLetterCommand(this.sendMessageToOtherPlayerCommand);
-        this.command_available = sendLetterCommand;
+        this.command_available = guessWordCommand;
 
     }
 

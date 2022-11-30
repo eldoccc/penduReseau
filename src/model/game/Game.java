@@ -1,20 +1,20 @@
-package model;
+package model.game;
 
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Game {
+public abstract class Game {
     private String secretWord;
     private int tries;
     private ArrayList<String> rightPlayedLetters;
     private ArrayList<String> wrongPlayedLetters;
-    private Socket client;
+    private Socket joueur1;
     private boolean lose;
 
-    public Game(String secretWord, Socket client) {
+    public Game(String secretWord, Socket joueur1) {
         this.secretWord = secretWord.toLowerCase();
         this.tries = 0;
-        this.client = client;
+        this.joueur1 = joueur1;
         this.rightPlayedLetters = new ArrayList<>();
         this.wrongPlayedLetters = new ArrayList<>();
 
@@ -106,12 +106,12 @@ public class Game {
         this.wrongPlayedLetters = wrongPlayedLetters;
     }
 
-    public Socket getClient() {
-        return client;
+    public Socket getJoueur1() {
+        return joueur1;
     }
 
-    public void setClient(Socket client) {
-        this.client = client;
+    public void setClient(Socket joueur1) {
+        this.joueur1 = joueur1;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class Game {
                 ", tries=" + tries +
                 ", rightPlayedLetters=" + rightPlayedLetters +
                 ", wrongPlayedLetters=" + wrongPlayedLetters +
-                ", client=" + client +
+                ", client=" + joueur1 +
                 ", lose=" + lose +
                 '}';
     }
