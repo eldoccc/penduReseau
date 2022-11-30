@@ -1,32 +1,36 @@
 package model.command;
 
-public class ReturnToMenuCommand extends BaseCommand{
+import model.Response2;
+
+public class ReturnToMenuCommand extends BaseCommand {
+
+    private static final String MENU = "/menu";
     public ReturnToMenuCommand(Command next) {
         super(next);
     }
 
     @Override
     public String getUsage() {
-        return null;
+        return MENU;
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Return to the menu";
     }
 
     @Override
     public String getExample() {
-        return null;
+        return MENU;
     }
 
     @Override
-    public void execute(String command) throws CommandException {
-
+    public Response2 run() {
+        return new Response2("You have returned to the menu", this.client.getEtat());
     }
 
     @Override
-    public boolean isValid(String command) {
-        return false;
+    public boolean isValid() {
+        return this.command.equals(MENU);
     }
 }

@@ -1,32 +1,36 @@
 package model.command;
 
+import model.Response2;
+
 public class RestartCommand extends BaseCommand {
+
+    private static final String RESTART = "/restart";
     public RestartCommand(BaseCommand nextCommand) {
         super(nextCommand);
     }
 
     @Override
     public String getUsage() {
-        return null;
+        return RESTART;
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Restart the game";
     }
 
     @Override
     public String getExample() {
-        return null;
+        return RESTART;
     }
 
     @Override
-    public void execute(String command) throws CommandException {
-
+    public Response2 run() {
+        return new Response2("Restarting the game", this.client.getEtat());
     }
 
     @Override
-    public boolean isValid(String command) {
-        return false;
+    public boolean isValid() {
+        return this.command.equals(RESTART);
     }
 }

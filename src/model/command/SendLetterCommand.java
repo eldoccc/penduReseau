@@ -1,5 +1,7 @@
 package model.command;
 
+import model.Response2;
+
 public class SendLetterCommand extends BaseCommand{
 
     private static final String SEND = "/try";
@@ -22,9 +24,10 @@ public class SendLetterCommand extends BaseCommand{
         return SEND + " a";
     }
 
-    @Override
-    public void run() {
 
+    @Override
+    public Response2 run() {
+        return new Response2("You have sent the letter " + this.args[0], this.client.getEtat());
     }
 
     @Override

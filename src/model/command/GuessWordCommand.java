@@ -1,5 +1,7 @@
 package model.command;
 
+import model.Response2;
+
 public class GuessWordCommand extends BaseCommand{
 
     private static final String COMMAND = "/guess";
@@ -23,14 +25,10 @@ public class GuessWordCommand extends BaseCommand{
         return COMMAND + " telephone";
     }
 
-    @Override
-    public void execute(String command) throws CommandException {
-
-    }
 
     @Override
-    public void run() {
-
+    public Response2 run() {
+        return new Response2("You have guessed the word", this.client.getEtat());
     }
 
     @Override

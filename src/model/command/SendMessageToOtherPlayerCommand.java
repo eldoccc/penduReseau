@@ -1,5 +1,7 @@
 package model.command;
 
+import model.Response2;
+
 public class SendMessageToOtherPlayerCommand extends BaseCommand{
 
     private static final String MESSAGE = "/message";
@@ -25,8 +27,8 @@ public class SendMessageToOtherPlayerCommand extends BaseCommand{
 
 
     @Override
-    public void run() {
-
+    public Response2 run() {
+        return null;
     }
 
     @Override
