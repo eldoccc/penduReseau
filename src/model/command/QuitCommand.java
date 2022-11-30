@@ -1,5 +1,8 @@
 package model.command;
 
+import model.Response2;
+import model.states.Etat;
+
 public class QuitCommand extends BaseCommand {
     private static final String COMMAND = "quit";
     public static final String QUIT_COMMAND_PUBLIC = COMMAND;
@@ -28,12 +31,15 @@ public class QuitCommand extends BaseCommand {
     }
 
     @Override
-    public void execute(String command) throws CommandException {
-        // TODO Auto-generated method stub
+    public Response2 run() {
+        // Close all necessary things
+
+        return new Response2("You have quit the game", this.client.getEtat());
     }
 
+
     @Override
-    public boolean isValid(String command) {
+    public boolean isValid() {
         return COMMAND.equals(command);
     }
 }

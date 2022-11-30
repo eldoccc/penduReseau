@@ -1,5 +1,7 @@
 package model.command;
 
+import model.Response2;
+
 public class ChangeDifficultyCommand extends BaseCommand {
     private static final String COMMAND = "/difficulty";
 
@@ -27,8 +29,9 @@ public class ChangeDifficultyCommand extends BaseCommand {
     }
 
     @Override
-    public void run() {
-
+    public Response2 run() {
+        this.client.setDifficulty(Integer.parseInt(this.args[0]));
+        return new Response2("Difficulty changed to " + this.args[0], this.client.getEtat());
     }
 
     @Override

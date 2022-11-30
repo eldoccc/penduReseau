@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 public class ServerClientThread extends Thread {
     private String name;
+    protected int difficulty;
     private Socket clientSocket;
     private BufferedReader in;
     private PrintStream out;
@@ -28,6 +29,7 @@ public class ServerClientThread extends Thread {
     public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> otherClients) {
         this.clientSocket = clientSocket;
         this.serverClientThreads = otherClients;
+        this.difficulty = 1;
         try {
             this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
             this.ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -56,38 +58,54 @@ public class ServerClientThread extends Thread {
     }
 
     public void run() {
+        // Infinite loop to get the client commands
         try {
-            game.setDifficulty(Integer.parseInt(in.readLine()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            while (true) {
+                // Get the command from the client
+                String command = in.readLine();
+                System.out.println("Command received: " + command);
 
-        while (!game.isLose() || clientSocket.isClosed()) {
-
-            // Receive a letter from the client
-            String letter = "";
-            try {
-                while (letter.length() != 1) {
-                    letter = in.readLine();
+                // If the command is quit then quit the game
+                if (command.equals("quit")) {
+                    this.oos.writeObject(new Response2("Goodbye", this.state));
+                    break;
                 }
-            } catch (Exception e) {
-                return;
+
+                // Execute the command
+                Response2 response = this.state.execute(command, this);
+
+                // Send the response to the client
+                this.oos.writeObject(response);
+
+                // If the client's state change, change the local state and print the commands
+                if (response.getState() != this.state) {
+                    this.changeState(response.getState());
+                    System.out.println(this.state.getClientInstruction());
+                }
             }
-
-            // Play the letter
-            int stateRound = this.game.playLetter(letter);
-            Response response = new Response(game.getTries() - game.amountOfWrongPlayedLetters(), game.generateWordWithLettersFound(), stateRound);
-
-            // Send the word with the letters found
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             try {
-                oos.writeObject(response);
-            } catch (java.io.IOException e) {
-                return;
+                end();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public String getSecretWord() {
-        return this.game.getSecretWord();
+    public void end() throws IOException {
+        this.clientSocket.close();
+        this.in.close();
+        this.out.close();
+        this.oos.close();
+        this.ois.close();
+    }
+
+    public Etat getEtat() {
+        return this.state;
+    }
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 }

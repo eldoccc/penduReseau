@@ -1,7 +1,13 @@
 package model.command;
 
 
+import model.Response2;
+import model.states.Etat;
+import server.ServerClientThread;
+
 public abstract class BaseCommand implements Command {
+
+    protected ServerClientThread client;
     protected Command next;
     protected String command;
     protected String[] args;
@@ -34,17 +40,18 @@ public abstract class BaseCommand implements Command {
 
 
     // Execute the command
-    public void execute(String command) throws CommandException {
+    public Response2 execute(String command, ServerClientThread c) throws CommandException {
         try {
             this.parse(command);
+            this.client = c;
         } catch(Exception e) {
             throw new CommandException("Erreur de synthaxe : " + e.getMessage());
         }
 
         if (isValid()) {
-            run();
+            return run();
         } else if (next != null) {
-            next.execute(command);
+            return next.execute(command, c);
         } else {
             throw new CommandException("Command not found");
         }
