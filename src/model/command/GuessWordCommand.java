@@ -25,15 +25,23 @@ public class GuessWordCommand extends BaseCommand{
         return COMMAND + " telephone";
     }
 
-
     @Override
     public Response2 run() {
         return new Response2("You have guessed the word", this.client.getEtat());
     }
 
     @Override
-    public boolean isValid() {
-        return this.command.equals(COMMAND) && this.args.length == 1 && this.args[0].length() > 1;
+    public String isValid() {
+        // Check if the word is not empty and if the word is not too long else return message
+        if (this.args.length > 0) {
+            if (this.getArgsAsString().length() < 100) {
+                return null;
+            } else {
+                return "Word is too long";
+            }
+        } else {
+            return "Word is empty";
+        }
     }
 
 }

@@ -39,7 +39,12 @@ public class QuitCommand extends BaseCommand {
 
 
     @Override
-    public boolean isValid() {
-        return COMMAND.equals(command);
+    public String isValid() {
+        // Check if there is no argument
+        if (this.args.length == 0) {
+            return null;
+        } else {
+            return "Too many arguments";
+        }
     }
 }

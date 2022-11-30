@@ -2,32 +2,37 @@ package model.command;
 
 import model.Response2;
 
-public class SendMessageToOtherPlayerCommand extends BaseCommand{
+public class SendMessageToGeneral extends BaseCommand {
+    private static final String COMMAND = "/msg";
 
-    private static final String MESSAGE = "/message";
-
-    public SendMessageToOtherPlayerCommand(Command next) {
-        super(next);
+    public SendMessageToGeneral(String command, String[] args) {
+        super(command, args);
     }
+
+    public SendMessageToGeneral(Command next) {
+        super(next);
+        this.command_name = COMMAND;
+    }
+
 
     @Override
     public String getUsage() {
-        return MESSAGE + " <message>";
+        return COMMAND + " <message>";
     }
 
     @Override
     public String getDescription() {
-        return "message the player";
+        return "Send a message to the general chat in the menu";
     }
 
     @Override
     public String getExample() {
-        return MESSAGE + "/message hello";
+        return COMMAND + " Hello everyone !";
     }
-
 
     @Override
     public Response2 run() {
+        this.client.sendMessageGeneral(this.getArgsAsString());
         return null;
     }
 

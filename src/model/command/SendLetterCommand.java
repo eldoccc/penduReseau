@@ -24,15 +24,27 @@ public class SendLetterCommand extends BaseCommand{
         return SEND + " a";
     }
 
-
     @Override
     public Response2 run() {
         return new Response2("You have sent the letter " + this.args[0], this.client.getEtat());
     }
 
     @Override
-    public boolean isValid() {
-        return this.command.equals(SEND) && this.args.length == 1 && this.args[0].length() == 1;
+    public String isValid() {
+        // Check if the letter is not empty and if the argument is a letter else return message
+        if (this.args.length > 0) {
+            if (this.args[0].length() == 1) {
+                if (Character.isLetter(this.args[0].charAt(0))) {
+                    return null;
+                } else {
+                    return "Argument is not a letter";
+                }
+            } else {
+                return "Argument is not a letter";
+            }
+        } else {
+            return "Argument is empty";
+        }
     }
 }
 

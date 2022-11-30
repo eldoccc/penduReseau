@@ -30,7 +30,7 @@ public class RestartCommand extends BaseCommand {
     }
 
     @Override
-    public boolean isValid() {
-        return this.command.equals(RESTART);
+    public String isValid() {
+        return "";
     }
 }

@@ -1,5 +1,6 @@
 package server;
 
+import model.command.CommandException;
 import model.game.Game;
 import model.Response;
 import model.Response2;
@@ -44,10 +45,6 @@ public class ServerClientThread extends Thread {
 
             // Init the player to the menu and also confirm the connection
             this.oos.writeObject(new Response2("Welcome to the game " + this.name, this.state));
-
-            //this.run();
-
-            System.out.println("End of thread");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,15 +69,23 @@ public class ServerClientThread extends Thread {
                 }
 
                 // Execute the command
-                Response2 response = this.state.execute(command, this);
+                Response2 response;
+                try {
+                    response = this.state.execute(command, this);
+                } catch (CommandException e) {
+                    response = new Response2(e.getMessage(), this.state);
+                }
 
-                // Send the response to the client
-                this.oos.writeObject(response);
 
-                // If the client's state change, change the local state and print the commands
-                if (response.getState() != this.state) {
-                    this.changeState(response.getState());
-                    System.out.println(this.state.getClientInstruction());
+                // Send the response to the client if there is one
+                if (response != null) {
+                    this.oos.writeObject(response);
+
+                    // If the client's state change, change the local state and print the commands
+                    if (response.getState() != this.state) {
+                        this.changeState(response.getState());
+                        System.out.println(this.state.getClientInstruction());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -100,6 +105,25 @@ public class ServerClientThread extends Thread {
         this.out.close();
         this.oos.close();
         this.ois.close();
+
+        this.serverClientThreads.remove(this);
+
+        System.out.println("Player " + this.name + " disconnected");
+    }
+
+
+    public void sendMessageGeneral(String message) {
+        for (ServerClientThread sct : this.serverClientThreads) {
+            sct.sendMessage("General from " + this.name + ": " + message);
+        }
+    }
+
+    private void sendMessage(String message) {
+        try {
+            this.oos.writeObject(new Response2(message, this.state));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Etat getEtat() {

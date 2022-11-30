@@ -11,6 +11,7 @@ public class ChangeDifficultyCommand extends BaseCommand {
 
     public ChangeDifficultyCommand(Command next) {
         super(next);
+        this.command_name = COMMAND;
     }
 
     @Override
@@ -35,8 +36,15 @@ public class ChangeDifficultyCommand extends BaseCommand {
     }
 
     @Override
-    public boolean isValid() {
-        // Valid if the command is "difficulty" and the difficulty is between 1 and 3
-        return this.command.equals(COMMAND) && this.args.length == 1 && Integer.parseInt(this.args[0]) >= 1 && Integer.parseInt(this.args[0]) <= 3;
+    public String isValid() {
+        // Valid if the difficulty is between 1 and 3 else return an error message
+        if (this.args.length == 1 && this.args[0].length() == 1) {
+            int difficulty = Integer.parseInt(this.args[0]);
+            if (difficulty >= 1 && difficulty <= 3) {
+                return null;
+            }
+            return "The difficulty must be between 1 and 3";
+        }
+        return "The difficulty must be a number between 1 and 3 (usage :" + this.getUsage() + ")";
     }
 }

@@ -2,13 +2,15 @@ package model.states;
 
 import model.command.BaseCommand;
 import model.command.ChangeDifficultyCommand;
+import model.command.SendMessageToGeneral;
 
 public class Menu extends Etat {
 
-    private BaseCommand changeDifficultyCommand;
+    private BaseCommand changeDifficultyCommand, sendMessageGeneral;
     public Menu() {
         super();
-        this.changeDifficultyCommand = new ChangeDifficultyCommand(this.quitCommand);
+        this.sendMessageGeneral = new SendMessageToGeneral(this.quitCommand);
+        this.changeDifficultyCommand = new ChangeDifficultyCommand(this.sendMessageGeneral);
         this.command_available = changeDifficultyCommand;
     }
 

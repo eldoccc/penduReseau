@@ -10,5 +10,6 @@ import java.io.Serializable;
 public interface Command extends Serializable {
     Response2 execute(String command, ServerClientThread c) throws CommandException;
     Response2 run();
-    boolean isValid();
+    boolean exist();
+    String isValid();
 }

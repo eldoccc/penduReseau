@@ -30,7 +30,7 @@ public class ReturnToMenuCommand extends BaseCommand {
     }
 
     @Override
-    public boolean isValid() {
-        return this.command.equals(MENU);
+    public String isValid() {
+        return "";
     }
 }

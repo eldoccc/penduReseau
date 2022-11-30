@@ -7,10 +7,12 @@ import server.ServerClientThread;
 
 public abstract class BaseCommand implements Command {
 
+
     protected ServerClientThread client;
     protected Command next;
     protected String command;
     protected String[] args;
+    protected String command_name;
 
     public BaseCommand(String command, String[] args) {
         this.command = command;
@@ -48,13 +50,22 @@ public abstract class BaseCommand implements Command {
             throw new CommandException("Erreur de synthaxe : " + e.getMessage());
         }
 
-        if (isValid()) {
+        if (exist()) {
+            String tmp = isValid();
+            if (tmp != null) {
+                throw new CommandException(tmp);
+            }
             return run();
         } else if (next != null) {
             return next.execute(command, c);
         } else {
             throw new CommandException("Command not found");
         }
+    }
+
+    // Check if the command exist
+    public boolean exist() {
+        return this.command.equals(this.command_name);
     }
 
     // Abstract method to get the command's help
