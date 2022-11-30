@@ -15,14 +15,7 @@ public abstract class BaseCommand implements Command {
         this.next = next;
     }
 
-    public String getCommand() {
-        return command;
-    }
-
-    public String[] getArgs() {
-        return args;
-    }
-
+    // Convert all arguments as a single string
     public String getArgsAsString() {
         StringBuilder args = new StringBuilder();
         for (String arg : this.args) {
@@ -31,9 +24,30 @@ public abstract class BaseCommand implements Command {
         return args.toString();
     }
 
-    @Override
-    public String toString() {
-        return "  - " + getUsage() + " : " + getDescription() + " (ex: " + getExample() + ")\n" + (next != null ? next.toString() : "");
+    // Convert the command string into the command arguments
+    public void parse(String command) {
+        String[] commandParts = command.split(" ");
+        this.command = commandParts[0];
+        this.args = new String[commandParts.length - 1];
+        System.arraycopy(commandParts, 1, this.args, 0, commandParts.length - 1);
+    }
+
+
+    // Execute the command
+    public void execute(String command) throws CommandException {
+        try {
+            this.parse(command);
+        } catch(Exception e) {
+            throw new CommandException("Erreur de synthaxe : " + e.getMessage());
+        }
+
+        if (isValid()) {
+            run();
+        } else if (next != null) {
+            next.execute(command);
+        } else {
+            throw new CommandException("Command not found");
+        }
     }
 
     // Abstract method to get the command's help
@@ -44,4 +58,19 @@ public abstract class BaseCommand implements Command {
 
     // Abstract method to get the command's example
     public abstract String getExample();
+
+
+
+    public String getCommand() {
+        return command;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    @Override
+    public String toString() {
+        return "  - " + getUsage() + " : " + getDescription() + " (ex: " + getExample() + ")\n" + (next != null ? next.toString() : "");
+    }
 }

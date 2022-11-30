@@ -13,7 +13,7 @@ public class ChangeDifficultyCommand extends BaseCommand {
 
     @Override
     public String getUsage() {
-        return COMMAND + " <difficulty>";
+        return COMMAND + " <difficulty number>";
     }
 
     @Override
@@ -27,12 +27,13 @@ public class ChangeDifficultyCommand extends BaseCommand {
     }
 
     @Override
-    public void execute(String command) throws CommandException {
-        // TODO Auto-generated method stub
+    public void run() {
+
     }
 
     @Override
-    public boolean isValid(String command) {
-        return COMMAND.equals(command);
+    public boolean isValid() {
+        // Valid if the command is "difficulty" and the difficulty is between 1 and 3
+        return this.command.equals(COMMAND) && this.args.length == 1 && Integer.parseInt(this.args[0]) >= 1 && Integer.parseInt(this.args[0]) <= 3;
     }
 }
