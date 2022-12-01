@@ -27,7 +27,10 @@ public class GuessWordCommand extends BaseCommand{
 
     @Override
     public Response2 run() {
-        return new Response2("You have guessed the word", this.client.getEtat());
+        if(this.client.getGame().guessWord(this.args[0])){
+            return new Response2("You have guessed the word !", this.client.getEtat());
+        }
+        else return new Response2("You haven't managed to guess the word !", this.client.getEtat());
     }
 
     @Override

@@ -9,20 +9,14 @@ public class InGame extends Etat {
     private BaseCommand sendMessageToOtherPlayerCommand;
     private BaseCommand guessWordCommand;
 
-    private int letterState;
-    /*
-     0 = already use
-     1 = letter match
-     2 = lose
-     3 = win
-     4 = letter not match
-    */
     private int triesLeft;
     private String hiddenWord;
 
 
-    public InGame() {
+    public InGame(int triesLeft, String hiddenWord) {
         super();
+        this.triesLeft = triesLeft;
+        this.hiddenWord = hiddenWord;
         this.sendLetterCommand = new SendLetterCommand(this.quitCommand);
         this.sendMessageToOtherPlayerCommand = new SendLetterCommand(this.sendLetterCommand);
         this.guessWordCommand = new SendLetterCommand(this.sendMessageToOtherPlayerCommand);
@@ -41,13 +35,6 @@ public class InGame extends Etat {
         return "InGame";
     }
 
-    public int getLetterState() {
-        return letterState;
-    }
-
-    public void setLetterState(int letterState) {
-        this.letterState = letterState;
-    }
 
     public int getTriesLeft() {
         return triesLeft;

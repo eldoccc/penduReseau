@@ -129,7 +129,17 @@ public class ServerClientThread extends Thread {
     public Etat getEtat() {
         return this.state;
     }
+
+    public void setEtat(Etat etat) {
+        this.state = etat;
+    }
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
     }
+
+    public Game getGame() {
+        return game;
+    }
 }
+
+
