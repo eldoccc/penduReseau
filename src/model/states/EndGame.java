@@ -7,17 +7,12 @@ import model.command.SendMessageToOtherPlayerCommand;
 
 public class EndGame extends Etat {
 
-    private boolean win;
-    private String secretWord;
-
     private BaseCommand restartCommand;
     private BaseCommand returnToMenuCommand;
     private BaseCommand sendMessageToOtherPlayerCommand;
 
-    public EndGame(boolean win, String secretWord) {
+    public EndGame() {
         super();
-        this.win = win;
-        this.secretWord = secretWord;
         this.restartCommand = new RestartCommand(this.quitCommand);
         this.returnToMenuCommand = new ReturnToMenuCommand(this.restartCommand);
         this.sendMessageToOtherPlayerCommand = new SendMessageToOtherPlayerCommand(this.returnToMenuCommand);
@@ -26,25 +21,20 @@ public class EndGame extends Etat {
 
     @Override
     public String getClientInstruction() {
-        if(win){
-            return "Vous avez gagné en devinant le mot " + getSecretWord() + " ,Commandes disponibles :\n" +
+        return "You are in the end game ! Commands :\n" +
+                this.command_available.toString();
+
+        /*if(win){
+            return "Vous avez gagné en devinant le mot " + getSecretWord() + ", Commandes disponibles :\n" +
                     this.command_available.toString();
         } else {
-            return "Vous avez perdu, le mot était " + getSecretWord() + " ,Commandes disponibles:\n" +
+            return "Vous avez perdu, le mot était " + getSecretWord() + ", Commandes disponibles:\n" +
                     this.command_available.toString();
-        }
+        }*/
     }
 
     @Override
     public String toString() {
         return "EndGame";
-    }
-
-    public String getSecretWord() {
-        return secretWord;
-    }
-
-    public void setSecretWord(String secretWord) {
-        this.secretWord = secretWord;
     }
 }

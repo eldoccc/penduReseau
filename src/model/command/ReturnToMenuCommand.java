@@ -5,9 +5,10 @@ import model.states.Menu;
 
 public class ReturnToMenuCommand extends BaseCommand {
 
-    private static final String MENU = "/menu";
+    private static final String MENU = "menu";
     public ReturnToMenuCommand(Command next) {
         super(next);
+        this.command_name = MENU;
     }
 
     @Override
@@ -27,7 +28,8 @@ public class ReturnToMenuCommand extends BaseCommand {
 
     @Override
     public Response2 run() {
-        this.client.changeState(new Menu());
+        this.client.setEtat(new Menu());
+        this.client.joinMenu();
         return new Response2("You have returned to the menu", this.client.getEtat());
     }
 

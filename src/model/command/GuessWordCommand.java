@@ -1,13 +1,16 @@
 package model.command;
 
 import model.Response2;
+import model.game.Game;
+import model.game.MultiplayerGame;
 
 public class GuessWordCommand extends BaseCommand{
 
-    private static final String COMMAND = "/guess";
+    private static final String COMMAND = "guess";
 
     public GuessWordCommand(Command next) {
         super(next);
+        this.command_name = COMMAND;
     }
 
     @Override
@@ -27,10 +30,15 @@ public class GuessWordCommand extends BaseCommand{
 
     @Override
     public Response2 run() {
-        if(this.client.getGame().guessWord(this.args[0])){
+        Game g = this.client.getGame();
+        if(g.guessWord(this.args[0])){
+            if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The guesser guessed the word !\n" + g);
             return new Response2("You have guessed the word !", this.client.getEtat());
         }
-        else return new Response2("You haven't managed to guess the word !", this.client.getEtat());
+        else {
+            if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The guesser tried the word " + this.args[0] + "\n" + g);
+            return new Response2("You haven't managed to guess the word !", this.client.getEtat());
+        }
     }
 
     @Override

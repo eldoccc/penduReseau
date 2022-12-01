@@ -2,10 +2,11 @@ package server;
 
 import model.command.CommandException;
 import model.game.Game;
-import model.Response;
 import model.Response2;
 import model.Wording;
+import model.game.MultiplayerGame;
 import model.states.Etat;
+import model.states.InQueue;
 import model.states.Menu;
 
 import java.io.*;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 public class ServerClientThread extends Thread {
     private String name;
     protected int difficulty;
+    private boolean isGuesser;
+    private ServerClientThread playerAsked;
     private Socket clientSocket;
     private BufferedReader in;
     private PrintStream out;
@@ -22,17 +25,20 @@ public class ServerClientThread extends Thread {
     private ObjectInputStream ois;
     private ArrayList<ServerClientThread> menuClients;
     private ArrayList<ServerClientThread> queueClients;
+    private ArrayList<Game> games;
+    private Game currentGame;
     private Etat state;
 
-    private Game game;
     private Wording wording;
 
 
-    public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> mC, ArrayList<ServerClientThread> qC) {
+    public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> mC, ArrayList<ServerClientThread> qC, ArrayList<Game> g) {
         this.clientSocket = clientSocket;
         this.menuClients = mC;
         this.queueClients = qC;
+        this.games = g;
         this.difficulty = 1;
+        this.isGuesser = true;
         try {
             this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
             this.ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -42,18 +48,15 @@ public class ServerClientThread extends Thread {
             // Get the player name
             this.name = in.readLine();
             System.out.println("Player " + this.name + " connected");
+            this.menuClients.add(this);
 
-            this.changeState(new Menu());
+            this.setEtat(new Menu());
 
             // Init the player to the menu and also confirm the connection
             this.oos.writeObject(new Response2("Welcome to the game " + this.name, this.state));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void changeState(Etat state) {
-        this.state = state;
     }
 
     public void run() {
@@ -85,7 +88,7 @@ public class ServerClientThread extends Thread {
 
                     // If the client's state change, change the local state and print the commands
                     if (response.getState() != this.state) {
-                        this.changeState(response.getState());
+                        this.setEtat(response.getState());
                         System.out.println(this.state.getClientInstruction());
                     }
                 }
@@ -102,15 +105,57 @@ public class ServerClientThread extends Thread {
     }
 
     public void end() throws IOException {
+        if (this.playerAsked != null) {
+            this.playerAsked.sendMessage("The invited player has left the game");
+            this.playerAsked.setPlayerAsked(null);
+        }
+
+        // If the player is in a game, reset the opponent if multiplayer and remove the game
+        if (this.currentGame != null) {
+            if (this.currentGame instanceof MultiplayerGame) {
+                MultiplayerGame tmp = (MultiplayerGame) this.currentGame;
+                if (this.isGuesser) {
+                    tmp.getDecider().setGame(null);
+                    tmp.getDecider().setEtat(new Menu());
+                    tmp.getDecider().joinMenu();
+                    tmp.getDecider().sendMessage("Your opponent has left the game");
+                } else {
+                    tmp.getGuesser().setGame(null);
+                    tmp.getGuesser().setEtat(new Menu());
+                    tmp.getGuesser().joinMenu();
+                    tmp.getGuesser().sendMessage("Your opponent has left the game");
+                }
+            }
+            this.currentGame.stop();
+            this.games.remove(this.currentGame);
+        }
+
         this.clientSocket.close();
         this.in.close();
         this.out.close();
         this.oos.close();
         this.ois.close();
 
-        this.serverClientThreads.remove(this);
+        try {
+            this.menuClients.remove(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            this.queueClients.remove(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         System.out.println("Player " + this.name + " disconnected");
+    }
+
+    public void sendResponse(Response2 response) {
+        try {
+            this.oos.writeObject(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -128,7 +173,7 @@ public class ServerClientThread extends Thread {
         }
     }
 
-    private void sendMessage(String message) {
+    public void sendMessage(String message) {
         try {
             this.oos.writeObject(new Response2(message, this.state));
         } catch (IOException e) {
@@ -139,16 +184,29 @@ public class ServerClientThread extends Thread {
     public Etat getEtat() {
         return this.state;
     }
+    public ServerClientThread getPlayerAsked() {
+        return this.playerAsked;
+    }
+    public void setPlayerAsked(ServerClientThread playerAsked) {
+        this.playerAsked = playerAsked;
+    }
+    public boolean isGuesser() {
+        return this.isGuesser;
+    }
+
+    public void setGuesser(boolean isGuesser) {
+        this.isGuesser = isGuesser;
+    }
+
+    public String getPlayerName() {
+        return this.name;
+    }
 
     public void setEtat(Etat etat) {
         this.state = etat;
     }
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
-    }
-
-    public Game getGame() {
-        return game;
     }
 
     public ArrayList<ServerClientThread> getPlayerInMenu() {
@@ -159,14 +217,86 @@ public class ServerClientThread extends Thread {
         return this.queueClients;
     }
 
-    public String printPlayersInQueue() {
-        // Return a string with the list of players in the state InQueue with their name and difficulty and index to choose them
-        String players = "";
-        int i = 0;
+    public ServerClientThread getPlayerByNameInQueue(String name) {
         for (ServerClientThread sct : this.queueClients) {
-            players += i + " - " + sct.name + " - Difficulty: " + sct.difficulty + "\n";
-            i++;
+            if (sct.name.equals(name)) {
+                return sct;
+            }
         }
-        return players;
+        return null;
+    }
+
+    public void sendCustomMessageToAPlayer(String message, String playerName) {
+        for (ServerClientThread sct : this.menuClients) {
+            if (sct.name.equals(playerName)) {
+                sct.sendMessage(message);
+            }
+        }
+        for (ServerClientThread sct : this.queueClients) {
+            if (sct.name.equals(playerName)) {
+                sct.sendMessage(message);
+            }
+        }
+    }
+
+    public void joinQueue() {
+        this.menuClients.remove(this);
+        if (!this.queueClients.contains(this)) {
+            this.queueClients.add(this);
+        }
+        this.setEtat(new InQueue());
+
+        // Inform all players in the queue that a new player joined
+        for (ServerClientThread sct : this.queueClients) {
+            if (sct.isGuesser != this.isGuesser) {
+                sct.sendMessage(this.name + " joined the queue");
+            }
+        }
+    }
+
+    public void leaveQueue() {
+        this.queueClients.remove(this);
+        this.menuClients.add(this);
+        this.setEtat(new Menu());
+
+        // Inform all players in the queue that a player left
+        for (ServerClientThread sct : this.queueClients) {
+            if (sct.isGuesser != this.isGuesser) {
+                sct.sendMessage(this.name + " left the queue");
+            }
+        }
+    }
+
+    public void addGame(Game game) {
+        this.games.add(game);
+    }
+
+    public void removeGame(Game game) {
+        this.games.remove(game);
+    }
+
+    public Game getGame() {
+        return this.currentGame;
+    }
+    public void setGame(Game game) {
+        this.currentGame = game;
+    }
+
+    public int getDifficulty() {
+        return this.difficulty;
+    }
+
+    public void leaveMenu() {
+        this.menuClients.remove(this);
+    }
+
+    public void joinMenu() {
+        if (!this.menuClients.contains(this)) {
+            this.menuClients.add(this);
+        }
+    }
+
+    public String toString() {
+        return "   " + this.name + " - Difficulty: " + this.difficulty;
     }
 }

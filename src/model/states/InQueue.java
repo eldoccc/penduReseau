@@ -1,22 +1,26 @@
 package model.states;
 
+import model.command.*;
 import model.command.BaseCommand;
 import model.command.ChangeDifficultyCommand;
 import model.command.SendMessageToGeneral;
 
 public class InQueue extends Etat {
 
-    private boolean foundTheWord;  // True if the player will find the word false if he give the word
-    //private BaseCommand changeDifficultyCommand, sendMessageGeneral;
-    public InQueue(boolean f) {
+    private BaseCommand AskToPlay, AcceptToPlay, DeclineToPlay, QuitQueue, ShowPlayers;
+    public InQueue() {
         super();
-        this.foundTheWord = f;
-        this.command_available = this.quitCommand;
+        this.AskToPlay = new AskToPlay(this.quitCommand);
+        this.AcceptToPlay = new AcceptToPlay(this.AskToPlay);
+        this.DeclineToPlay = new DeclineToPlay(this.AcceptToPlay);
+        this.QuitQueue = new QuitQueue(this.DeclineToPlay);
+        this.ShowPlayers = new ShowAvailablePlayers(this.QuitQueue);
+        this.command_available = this.ShowPlayers;
     }
 
     @Override
     public String getClientInstruction() {
-        return "Vous entrez en recherche de partie... Commandes :\n" +
+        return "You enter in search of an opponent... Commands :\n" +
                 this.command_available.toString();
     }
 

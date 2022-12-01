@@ -1,7 +1,9 @@
 package model.states;
 
 import model.command.BaseCommand;
+import model.command.GuessWordCommand;
 import model.command.SendLetterCommand;
+import model.command.SendMessageToOtherPlayerCommand;
 
 public class InGame extends Etat {
 
@@ -9,19 +11,17 @@ public class InGame extends Etat {
     private BaseCommand sendMessageToOtherPlayerCommand;
     private BaseCommand guessWordCommand;
 
-    private int triesLeft;
-    private String hiddenWord;
 
-
-    public InGame(int triesLeft, String hiddenWord) {
+    public InGame(boolean isGuesser) {
         super();
-        this.triesLeft = triesLeft;
-        this.hiddenWord = hiddenWord;
-        this.sendLetterCommand = new SendLetterCommand(this.quitCommand);
-        this.sendMessageToOtherPlayerCommand = new SendLetterCommand(this.sendLetterCommand);
-        this.guessWordCommand = new SendLetterCommand(this.sendMessageToOtherPlayerCommand);
-        this.command_available = guessWordCommand;
-
+        if (isGuesser) {
+            this.sendLetterCommand = new SendLetterCommand(this.quitCommand);
+            this.guessWordCommand = new GuessWordCommand(this.sendLetterCommand);
+            this.sendMessageToOtherPlayerCommand = new SendMessageToOtherPlayerCommand(this.guessWordCommand);
+        } else {
+            this.sendMessageToOtherPlayerCommand = new SendMessageToOtherPlayerCommand(this.quitCommand);
+        }
+        this.command_available = sendMessageToOtherPlayerCommand;
     }
 
     @Override
@@ -33,23 +33,6 @@ public class InGame extends Etat {
     @Override
     public String toString() {
         return "InGame";
-    }
-
-
-    public int getTriesLeft() {
-        return triesLeft;
-    }
-
-    public void setTriesLeft(int triesLeft) {
-        this.triesLeft = triesLeft;
-    }
-
-    public String getHiddenWord() {
-        return hiddenWord;
-    }
-
-    public void setHiddenWord(String hiddenWord) {
-        this.hiddenWord = hiddenWord;
     }
 }
 

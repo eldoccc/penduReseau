@@ -5,6 +5,8 @@ import model.Response2;
 import model.states.Etat;
 import server.ServerClientThread;
 
+import java.util.ArrayList;
+
 public abstract class BaseCommand implements Command {
 
 
@@ -30,6 +32,19 @@ public abstract class BaseCommand implements Command {
             args.append(arg).append(" ");
         }
         return args.toString();
+    }
+
+    public ArrayList<ServerClientThread> getAvailablePlayers() {
+        // Player is available if he is in the queue, if his isGuesser is different and if he is not in playerAsked
+        return this.client.getPlayerInQueue().stream().filter(player -> player.isGuesser() != this.client.isGuesser() && player.getPlayerAsked() == null).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    public String printPlayers(ArrayList<ServerClientThread> players) {
+        StringBuilder playersString = new StringBuilder();
+        for (ServerClientThread sct : players) {
+            playersString.append(sct.toString()).append("\n");
+        }
+        return playersString.toString();
     }
 
     // Convert the command string into the command arguments

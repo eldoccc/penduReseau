@@ -3,7 +3,7 @@ package model.command;
 import model.Response2;
 
 public class SendMessageToGeneral extends BaseCommand {
-    private static final String COMMAND = "/msg";
+    private static final String COMMAND = "msg";
 
     public SendMessageToGeneral(String command, String[] args) {
         super(command, args);

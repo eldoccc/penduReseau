@@ -1,6 +1,9 @@
 package server;
 
+import model.game.Game;
+
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -16,16 +19,14 @@ public class MainServer {
     public static void main(String[] args) {
         ArrayList<ServerClientThread> serverClientThreadsInMenu = new ArrayList<>();
         ArrayList<ServerClientThread> serverClientThreadsInQueue = new ArrayList<>();
-        // TODO : Add a list of all the games that contains the players in the game
+        ArrayList<Game> games = new ArrayList<>();
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server started. Waiting for a client ...");
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                ServerClientThread serverClientThread = new ServerClientThread(clientSocket, serverClientThreads);
-                serverClientThreads.add(serverClientThread);
+                ServerClientThread serverClientThread = new ServerClientThread(clientSocket, serverClientThreadsInMenu, serverClientThreadsInQueue, games);
                 serverClientThread.start();
-                //System.out.println(clientSocket.getInetAddress().getHostAddress() + " connected");
             }
         } catch (IOException e) {
             System.err.println("Accept failed.");

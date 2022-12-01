@@ -3,10 +3,8 @@ package model.command;
 import model.Response2;
 import server.ServerClientThread;
 
-import java.util.ArrayList;
-
 public class AskToPlay extends BaseCommand {
-    private static final String COMMAND = "/pw";
+    private static final String COMMAND = "pw";
 
     public AskToPlay(String command, String[] args) {
         super(command, args);
@@ -19,41 +17,51 @@ public class AskToPlay extends BaseCommand {
 
     @Override
     public String getUsage() {
-        return COMMAND + " <player_number>";
+        return COMMAND + " <player_name>";
     }
 
     @Override
     public String getDescription() {
-        return "Choose a player to play with (player_number is the number of the player in the list)";
+        return "Choose a player to play with (player_name is the name of the player)";
     }
 
     @Override
     public String getExample() {
-        return COMMAND + " 4";
+        return COMMAND + " Thibault";
     }
 
     @Override
     public Response2 run() {
-        this.client.setDifficulty(Integer.parseInt(this.args[0]));
-        return new Response2("Difficulty changed to " + this.args[0], this.client.getEtat());
+        try {
+            ServerClientThread player = this.client.getPlayerByNameInQueue(this.args[0]);
+            if (player != null) {
+                player.sendMessage("Vous avez été invité à jouer par " + this.client.getPlayerName());
+                this.client.setPlayerAsked(player);
+                player.setPlayerAsked(this.client);
+                return new Response2("Demande envoyée à " + player.getPlayerName(), this.client.getEtat());
+            } else {
+                return new Response2("Le joueur n'existe pas", this.client.getEtat());
+            }
+        } catch (Exception e) {
+            return new Response2("Une erreur est survenue", this.client.getEtat());
+        }
     }
 
     @Override
     public String isValid() {
-        // Check if the number match a player in the queue
-        if (this.args.length == 1) {
-            try {
-                int number = Integer.parseInt(this.args[0]);
-                if (number > 0 && number <= this.client.getPlayerInQueue().size()) {
-                    return null;
-                } else {
-                    return "The number must match a player in the queue bellow : \n" + this.client.getPlayerInQueue();
-                }
-            } catch (NumberFormatException e) {
-                return "The number must be an integer";
-            }
-        } else {
-            return "You must enter a number";
+        if (this.args.length != 1) {
+            return "Invalid number of arguments";
         }
+
+        ServerClientThread player = this.client.getPlayerByNameInQueue(this.args[0]);
+        if (player == null) {
+            return "Player not found";
+        } else {
+            if (!this.getAvailablePlayers().contains(player)) {
+                return "Player not available";
+            }
+        }
+
+        return null;
     }
 }

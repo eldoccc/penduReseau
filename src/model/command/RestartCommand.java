@@ -2,13 +2,16 @@ package model.command;
 
 import model.Response2;
 import model.Wording;
+import model.game.Game;
+import model.game.SingleplayerGame;
 import model.states.InGame;
 
 public class RestartCommand extends BaseCommand {
 
-    private static final String RESTART = "/restart";
+    private static final String RESTART = "restart";
     public RestartCommand(BaseCommand nextCommand) {
         super(nextCommand);
+        this.command_name = RESTART;
     }
 
     @Override
@@ -28,9 +31,21 @@ public class RestartCommand extends BaseCommand {
 
     @Override
     public Response2 run() {
-        Wording wording = Wording.getInstance();
-        this.client.changeState(new InGame(this.client.getGame().getTries(),wording.getRandomWord()));
-        return new Response2("Restarting the game", this.client.getEtat());
+        if (this.client.getGame() instanceof SingleplayerGame) {
+            this.client.removeGame(this.client.getGame());
+            this.client.setGame(null);
+
+            Wording wording = Wording.getInstance();
+            String word = wording.getRandomWord();
+            Game g = new SingleplayerGame(word, this.client);
+            this.client.addGame(g);
+            this.client.setGame(g);
+            this.client.setEtat(new InGame(true));
+
+            return new Response2("Restarting a new game\n" + g, this.client.getEtat());
+        } else {
+            return new Response2("You can't restart a multiplayer game", this.client.getEtat());
+        }
     }
 
     @Override

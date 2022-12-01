@@ -6,11 +6,12 @@ import java.net.Socket;
 
 public class MultiplayerGame extends Game{
     private String lastMessageSent;
-    private Socket joueur2;
+    private ServerClientThread joueur2;
 
 
-    public MultiplayerGame(String secretWord, ServerClientThread client) {
-        super(secretWord, client);
+    public MultiplayerGame(String secretWord, ServerClientThread guesser, ServerClientThread decider) {
+        super(secretWord, guesser);
+        this.joueur2 = decider;
     }
 
     public String getLastMessageSent() {
@@ -21,19 +22,11 @@ public class MultiplayerGame extends Game{
         this.lastMessageSent = lastMessageSent;
     }
 
-    public Socket getJoueur2() {
-        return joueur2;
+    public ServerClientThread getGuesser() {
+        return this.getJoueur1();
     }
 
-    public void setJoueur2(Socket joueur2) {
-        this.joueur2 = joueur2;
-    }
-
-
-    @Override
-    public String toString() {
-        return "MultiplayerGame{" +
-                "joueur2=" + joueur2 +
-                '}';
+    public ServerClientThread getDecider() {
+        return this.joueur2;
     }
 }

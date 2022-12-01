@@ -6,7 +6,7 @@ import model.states.Etat;
 import java.io.IOException;
 
 public class QuitCommand extends BaseCommand {
-    private static final String COMMAND = "/quit";
+    private static final String COMMAND = "quit";
     public static final String QUIT_COMMAND_PUBLIC = COMMAND;
 
     public QuitCommand(String command, String[] args) {

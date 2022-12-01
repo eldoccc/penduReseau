@@ -5,14 +5,20 @@ import server.ServerClientThread;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
 
 public abstract class Game {
     private String secretWord;
     private int tries;
+    private int duration;
+    private long startTime;
     private ArrayList<String> rightPlayedLetters;
     private ArrayList<String> wrongPlayedLetters;
     private ServerClientThread joueur1;
     private boolean lose;
+    private Timer timer;
 
     public static enum letterPlayed {
         RIGHT, WRONG, ALREADY_PLAYED
@@ -20,17 +26,25 @@ public abstract class Game {
 
     public Game(String secretWord, ServerClientThread joueur1) {
         this.secretWord = secretWord.toLowerCase();
-        this.tries = 0;
+        this.setDifficulty(joueur1.getDifficulty());
         this.joueur1 = joueur1;
         this.rightPlayedLetters = new ArrayList<>();
         this.wrongPlayedLetters = new ArrayList<>();
 
         this.lose = false;
+
+        this.timer = new Timer();
+        this.timer.schedule(new GameTimer(this), this.duration * 1000L);
+
+        this.startTime = System.currentTimeMillis();
+
+        System.out.println("Game created with secret word: " + this.secretWord);
     }
+
 
     public letterPlayed playLetter(String letter) {
         letter = letter.toLowerCase();
-        if (rightPlayedLetters.contains(letter)) {
+        if (rightPlayedLetters.contains(letter) || wrongPlayedLetters.contains(letter)) {
             return letterPlayed.ALREADY_PLAYED;
         }
         if (!secretWord.toLowerCase().contains(letter)) {
@@ -38,7 +52,11 @@ public abstract class Game {
             return letterPlayed.WRONG;
         }
         rightPlayedLetters.add(letter);
-        checkWin("LETTER_TRIED");
+        if (checkWin("LETTER_TRIED")) {
+            this.timer.cancel();
+            joueur1.sendMessage("You won !");
+            joueur1.setEtat(new EndGame());
+        }
 
         return letterPlayed.RIGHT;
     }
@@ -109,14 +127,12 @@ public abstract class Game {
 
     @Override
     public String toString() {
-        return "Game{" +
-                "secretWord='" + secretWord + '\'' +
-                ", tries=" + tries +
-                ", rightPlayedLetters=" + rightPlayedLetters +
-                ", wrongPlayedLetters=" + wrongPlayedLetters +
-                ", client=" + joueur1 +
-                ", lose=" + lose +
-                '}';
+        return "------------------" + "Game : " + this.getReamingTime() + "s remains------------------" + "\n" +
+                "  The word : " + this.generateWordWithLettersFound() + "\n" +
+                "  Tries left : " + (tries - this.amountOfWrongPlayedLetters()) + "\n" +
+                "  Right played letters : " + String.join(", ", this.rightPlayedLetters) + "\n" +
+                "  Wrong played letters : " + String.join(", ", this.wrongPlayedLetters) + "\n" +
+                "-------------------------------------------------" + "\n";
     }
 
     public int amountOfWrongPlayedLetters() {
@@ -125,17 +141,17 @@ public abstract class Game {
 
     public void setDifficulty(int difficulty){
         switch (difficulty) {
-            case 1 :
-                this.tries = 10;
-                break;
             case 2 :
                 this.tries = 6;
+                this.duration = 90;
                 break;
             case 3:
                 this.tries = 4;
+                this.duration = 60;
                 break;
-            default:
+            default:  // Easy mode (case 1)
                 this.tries = 10;
+                this.duration = 120;
                 break;
 
         }
@@ -148,19 +164,37 @@ public abstract class Game {
 
     public boolean guessWord(String arg) {
         if (checkWin(arg)) {
-            joueur1.setEtat(new EndGame(true,secretWord));
+            this.timer.cancel();
+            joueur1.sendMessage("You won !");
+            joueur1.setEtat(new EndGame());
             return true;
         } else {
-            removeTry("$");
+            this.tries--;
+            this.checkLose();
             return false;
         }
     }
 
     public void removeTry(String letter) {
         this.wrongPlayedLetters.add(letter);
+        checkLose();
+    }
+
+    private void checkLose() {
         if (this.tries == wrongPlayedLetters.size()) {
-            joueur1.setEtat(new EndGame(false,secretWord));
+            this.timer.cancel();
+            joueur1.sendMessage("You lose...");
+            joueur1.setEtat(new EndGame());
         }
+    }
+
+    private int getReamingTime() {
+        return (int) (this.duration - (System.currentTimeMillis() - this.startTime) / 1000);
+    }
+
+
+    public void stop() {
+        this.timer.cancel();
     }
 }
 

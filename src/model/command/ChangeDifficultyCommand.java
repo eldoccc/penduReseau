@@ -3,7 +3,7 @@ package model.command;
 import model.Response2;
 
 public class ChangeDifficultyCommand extends BaseCommand {
-    private static final String COMMAND = "/difficulty";
+    private static final String COMMAND = "diff";
 
     public ChangeDifficultyCommand(String command, String[] args) {
         super(command, args);

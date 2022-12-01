@@ -1,12 +1,15 @@
 package model.command;
 
 import model.Response2;
+import model.game.Game;
+import model.game.MultiplayerGame;
 
 public class SendLetterCommand extends BaseCommand{
 
-    private static final String SEND = "/try";
+    private static final String SEND = "try";
     public SendLetterCommand(Command next) {
         super(next);
+        this.command_name = SEND;
     }
 
     @Override
@@ -26,15 +29,19 @@ public class SendLetterCommand extends BaseCommand{
 
     @Override
     public Response2 run() {
-        switch (this.client.getGame().playLetter(this.args[0])){
+        Game g = this.client.getGame();
+        switch (g.playLetter(this.args[0])){
             case ALREADY_PLAYED -> {
-                return new Response2("You have already played this letter !", this.client.getEtat());
+                if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The letter " + this.args[0] + " has already been played\n" + g);
+                return new Response2("You have already played this letter !\n" + this.client.getGame(), this.client.getEtat());
             }
             case RIGHT -> {
-                return new Response2("You have found a letter !", this.client.getEtat());
+                if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The letter " + this.args[0] + " is in the word\n" + g);
+                return new Response2("You have found a letter !\n" + this.client.getGame(), this.client.getEtat());
             }
             case WRONG -> {
-                return new Response2("You haven't found a letter !", this.client.getEtat());
+                if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The letter " + this.args[0] + " is not in the word\n" + g);
+                return new Response2("You haven't found a letter !\n" + this.client.getGame(), this.client.getEtat());
             }
         }
         return null;
@@ -58,4 +65,3 @@ public class SendLetterCommand extends BaseCommand{
         }
     }
 }
-
