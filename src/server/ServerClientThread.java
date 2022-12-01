@@ -50,7 +50,7 @@ public class ServerClientThread extends Thread {
         }
     }
 
-    private void changeState(Etat state) {
+    public void changeState(Etat state) {
         this.state = state;
     }
 
@@ -115,6 +115,14 @@ public class ServerClientThread extends Thread {
     public void sendMessageGeneral(String message) {
         for (ServerClientThread sct : this.serverClientThreads) {
             sct.sendMessage("General from " + this.name + ": " + message);
+        }
+    }
+
+    public void sendMessageToOtherPlayer(String message,String receiver) {
+        for (ServerClientThread sct : this.serverClientThreads) {
+            if (sct.name.equals(receiver)) {
+                sct.sendMessage("Private from " + this.name + ": " + message);
+            }
         }
     }
 

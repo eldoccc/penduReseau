@@ -57,7 +57,7 @@ public abstract class Game {
             }
         }
         return word;
-    }à
+    }
 
     public String getSecretWord() {
         return secretWord;

@@ -1,6 +1,7 @@
 package model.command;
 
 import model.Response2;
+import model.states.Menu;
 
 public class ReturnToMenuCommand extends BaseCommand {
 
@@ -26,11 +27,12 @@ public class ReturnToMenuCommand extends BaseCommand {
 
     @Override
     public Response2 run() {
+        this.client.changeState(new Menu());
         return new Response2("You have returned to the menu", this.client.getEtat());
     }
 
     @Override
     public String isValid() {
-        return "";
+        return args.length == 0 ? null : "Invalid number of arguments";
     }
 }

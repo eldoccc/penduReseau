@@ -4,33 +4,34 @@ import model.Response2;
 import model.Wording;
 import model.states.InGame;
 
-public class RestartCommand extends BaseCommand {
+public class PlayCommand extends BaseCommand{
 
-    private static final String RESTART = "/restart";
-    public RestartCommand(BaseCommand nextCommand) {
-        super(nextCommand);
+    private static final String PLAY = "/play";
+
+    public PlayCommand(BaseCommand command) {
+        super(command);
     }
 
     @Override
     public String getUsage() {
-        return RESTART;
+        return PLAY;
     }
 
     @Override
     public String getDescription() {
-        return "Restart the game";
+        return "Play a game";
     }
 
     @Override
     public String getExample() {
-        return RESTART;
+        return PLAY;
     }
 
     @Override
     public Response2 run() {
         Wording wording = Wording.getInstance();
         this.client.changeState(new InGame(this.client.getGame().getTries(),wording.getRandomWord()));
-        return new Response2("Restarting the game", this.client.getEtat());
+        return new Response2("Starting a new game", this.client.getEtat());
     }
 
     @Override

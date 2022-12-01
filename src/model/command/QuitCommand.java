@@ -3,6 +3,8 @@ package model.command;
 import model.Response2;
 import model.states.Etat;
 
+import java.io.IOException;
+
 public class QuitCommand extends BaseCommand {
     private static final String COMMAND = "/quit";
     public static final String QUIT_COMMAND_PUBLIC = COMMAND;
@@ -33,7 +35,11 @@ public class QuitCommand extends BaseCommand {
     @Override
     public Response2 run() {
         // Close all necessary things
-
+        try {
+            this.client.end();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return new Response2("You have quit the game", this.client.getEtat());
     }
 
