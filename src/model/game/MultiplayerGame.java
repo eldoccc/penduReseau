@@ -1,5 +1,7 @@
 package model.game;
 
+import server.ServerClientThread;
+
 import java.net.Socket;
 
 public class MultiplayerGame extends Game{
@@ -7,7 +9,7 @@ public class MultiplayerGame extends Game{
     private Socket joueur2;
 
 
-    public MultiplayerGame(String secretWord, Socket client) {
+    public MultiplayerGame(String secretWord, ServerClientThread client) {
         super(secretWord, client);
     }
 

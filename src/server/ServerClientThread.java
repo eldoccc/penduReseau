@@ -121,7 +121,7 @@ public class ServerClientThread extends Thread {
     }
 
     public void sendMessageToOtherPlayer(String message,String receiver) {
-        for (ServerClientThread sct : this.serverClientThreads) {
+        for (ServerClientThread sct : this.menuClients) {
             if (sct.name.equals(receiver)) {
                 sct.sendMessage("Private from " + this.name + ": " + message);
             }
