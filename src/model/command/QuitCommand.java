@@ -13,6 +13,7 @@ public class QuitCommand extends BaseCommand {
 
     public QuitCommand(Command next) {
         super(next);
+        this.command_name = COMMAND;
     }
 
     @Override

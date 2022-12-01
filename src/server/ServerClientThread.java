@@ -1,5 +1,6 @@
 package server;
 
+import com.sun.security.ntlm.Server;
 import model.command.CommandException;
 import model.game.Game;
 import model.Response;
@@ -20,16 +21,18 @@ public class ServerClientThread extends Thread {
     private PrintStream out;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
-    private ArrayList<ServerClientThread> serverClientThreads;
+    private ArrayList<ServerClientThread> menuClients;
+    private ArrayList<ServerClientThread> queueClients;
     private Etat state;
 
     private Game game;
     private Wording wording;
 
 
-    public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> otherClients) {
+    public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> mC, ArrayList<ServerClientThread> qC) {
         this.clientSocket = clientSocket;
-        this.serverClientThreads = otherClients;
+        this.menuClients = mC;
+        this.queueClients = qC;
         this.difficulty = 1;
         try {
             this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
@@ -113,7 +116,7 @@ public class ServerClientThread extends Thread {
 
 
     public void sendMessageGeneral(String message) {
-        for (ServerClientThread sct : this.serverClientThreads) {
+        for (ServerClientThread sct : this.menuClients) {
             sct.sendMessage("General from " + this.name + ": " + message);
         }
     }
@@ -131,5 +134,24 @@ public class ServerClientThread extends Thread {
     }
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public ArrayList<ServerClientThread> getPlayerInMenu() {
+        return menuClients;
+    }
+
+    public ArrayList<ServerClientThread> getPlayerInQueue() {
+        return this.queueClients;
+    }
+
+    public String printPlayersInQueue() {
+        // Return a string with the list of players in the state InQueue with their name and difficulty and index to choose them
+        String players = "";
+        int i = 0;
+        for (ServerClientThread sct : this.queueClients) {
+            players += i + " - " + sct.name + " - Difficulty: " + sct.difficulty + "\n";
+            i++;
+        }
+        return players;
     }
 }

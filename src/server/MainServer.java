@@ -14,7 +14,9 @@ public class MainServer {
 
 
     public static void main(String[] args) {
-        ArrayList<ServerClientThread> serverClientThreads = new ArrayList<>();
+        ArrayList<ServerClientThread> serverClientThreadsInMenu = new ArrayList<>();
+        ArrayList<ServerClientThread> serverClientThreadsInQueue = new ArrayList<>();
+        // TODO : Add a list of all the games that contains the players in the game
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server started. Waiting for a client ...");
