@@ -1,6 +1,5 @@
 package server;
 
-import com.sun.security.ntlm.Server;
 import model.command.CommandException;
 import model.game.Game;
 import model.Response;
@@ -132,8 +131,16 @@ public class ServerClientThread extends Thread {
     public Etat getEtat() {
         return this.state;
     }
+
+    public void setEtat(Etat etat) {
+        this.state = etat;
+    }
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public Game getGame() {
+        return game;
     }
 
     public ArrayList<ServerClientThread> getPlayerInMenu() {

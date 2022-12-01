@@ -26,7 +26,18 @@ public class SendLetterCommand extends BaseCommand{
 
     @Override
     public Response2 run() {
-        return new Response2("You have sent the letter " + this.args[0], this.client.getEtat());
+        switch (this.client.getGame().playLetter(this.args[0])){
+            case ALREADY_PLAYED -> {
+                return new Response2("You have already played this letter !", this.client.getEtat());
+            }
+            case RIGHT -> {
+                return new Response2("You have found a letter !", this.client.getEtat());
+            }
+            case WRONG -> {
+                return new Response2("You haven't found a letter !", this.client.getEtat());
+            }
+        }
+        return null;
     }
 
     @Override

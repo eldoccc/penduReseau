@@ -1,5 +1,8 @@
 package model.game;
 
+import model.states.EndGame;
+import server.ServerClientThread;
+
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -8,10 +11,14 @@ public abstract class Game {
     private int tries;
     private ArrayList<String> rightPlayedLetters;
     private ArrayList<String> wrongPlayedLetters;
-    private Socket joueur1;
+    private ServerClientThread joueur1;
     private boolean lose;
 
-    public Game(String secretWord, Socket joueur1) {
+    public static enum letterPlayed {
+        RIGHT, WRONG, ALREADY_PLAYED
+    }
+
+    public Game(String secretWord, ServerClientThread joueur1) {
         this.secretWord = secretWord.toLowerCase();
         this.tries = 0;
         this.joueur1 = joueur1;
@@ -21,33 +28,19 @@ public abstract class Game {
         this.lose = false;
     }
 
-    /*
-     0 = already use
-     1 = letter match
-     2 = lose
-     3 = win
-     4 = letter not match
-    */
-    public int playLetter(String letter) {
+    public letterPlayed playLetter(String letter) {
         letter = letter.toLowerCase();
         if (rightPlayedLetters.contains(letter)) {
-            return 0;
+            return letterPlayed.ALREADY_PLAYED;
         }
-        //playedLetters.add(letter);
         if (!secretWord.toLowerCase().contains(letter)) {
-            wrongPlayedLetters.add(letter);
-            if (tries == wrongPlayedLetters.size()) {
-                lose = true;
-                return 2;
-            }
-            return 4;
+            removeTry(letter);
+            return letterPlayed.WRONG;
         }
         rightPlayedLetters.add(letter);
-        if (generateWordWithLettersFound().equals(secretWord)) {
-            return 3;
-        }
+        checkWin("LETTER_TRIED");
 
-        return 1;
+        return letterPlayed.RIGHT;
     }
 
     public String generateWordWithLettersFound() {
@@ -64,7 +57,7 @@ public abstract class Game {
             }
         }
         return word;
-    }
+    }à
 
     public String getSecretWord() {
         return secretWord;
@@ -106,11 +99,11 @@ public abstract class Game {
         this.wrongPlayedLetters = wrongPlayedLetters;
     }
 
-    public Socket getJoueur1() {
+    public ServerClientThread getJoueur1() {
         return joueur1;
     }
 
-    public void setClient(Socket joueur1) {
+    public void setClient(ServerClientThread joueur1) {
         this.joueur1 = joueur1;
     }
 
@@ -145,6 +138,28 @@ public abstract class Game {
                 this.tries = 10;
                 break;
 
+        }
+    }
+
+    public boolean checkWin(String word){
+        if (word.equals("LETTER_TRIED")) return generateWordWithLettersFound().equals(secretWord);
+        else return word.equals(secretWord);
+    }
+
+    public boolean guessWord(String arg) {
+        if (checkWin(arg)) {
+            joueur1.setEtat(new EndGame(true,secretWord));
+            return true;
+        } else {
+            removeTry("$");
+            return false;
+        }
+    }
+
+    public void removeTry(String letter) {
+        this.wrongPlayedLetters.add(letter);
+        if (this.tries == wrongPlayedLetters.size()) {
+            joueur1.setEtat(new EndGame(false,secretWord));
         }
     }
 }
