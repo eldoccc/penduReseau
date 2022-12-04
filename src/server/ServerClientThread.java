@@ -13,47 +13,53 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/*
+    Thread of a single client connected to the server handling the communication between the client and the server
+ */
 public class ServerClientThread extends Thread {
-    private String name;
-    protected int difficulty;
-    private boolean isGuesser;
-    private ServerClientThread playerAsked;
-    private Socket clientSocket;
-    private BufferedReader in;
-    private PrintStream out;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
-    private ArrayList<ServerClientThread> menuClients;
-    private ArrayList<ServerClientThread> queueClients;
-    private ArrayList<Game> games;
-    private Game currentGame;
-    private Etat state;
-
-    private Wording wording;
+    private String name;  // Name of the player
+    protected int difficulty;  // Difficulty selected by the player (default 1)
+    private boolean isGuesser;  // Boolean to know if the player is the guesser or the decider
+    private ServerClientThread playerAsked;  // Player asked by the player to play with (null if no player asked)
+    private Socket clientSocket;  // Socket of the client
+    private BufferedReader in;  // Input stream of the client
+    private PrintStream out;  // Output stream of the client
+    private ObjectOutputStream oos;  // Object output stream of the client
+    private ObjectInputStream ois;  // Object input stream of the client
+    private ArrayList<ServerClientThread> menuClients;  // List of all the clients in the menu sync with the list in the server
+    private ArrayList<ServerClientThread> queueClients;  // List of all the clients in the queue sync with the list in the server
+    private ArrayList<Game> games;  // List of all the games currently running sync with the list in the server
+    private Game currentGame;  // Game that contains the player (null if the player isn't playing)
+    private Etat state;  // State of the player (menu, queue, game)
 
 
+    /*
+        Constructor of the thread of a client
+     */
     public ServerClientThread(Socket clientSocket, ArrayList<ServerClientThread> mC, ArrayList<ServerClientThread> qC, ArrayList<Game> g) {
         this.clientSocket = clientSocket;
         this.menuClients = mC;
         this.queueClients = qC;
         this.games = g;
-        this.difficulty = 1;
-        this.isGuesser = true;
+        this.difficulty = 1;  // default difficulty (esay mode)
+        this.isGuesser = true;  // default role (guesser)
         try {
+            /*
+                Creating the input and output streams of the client
+             */
             this.in = new BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream()));
             this.ois = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new PrintStream(clientSocket.getOutputStream());
             this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
 
-            // Get the player name
-            this.name = in.readLine();
+            this.name = in.readLine();  // Receive the name of the player from the client
             System.out.println("Player " + this.name + " connected");
-            this.menuClients.add(this);
+            this.menuClients.add(this);  // Add the player to the list of players in the menu
 
-            this.setEtat(new Menu());
+            this.setEtat(new Menu());  // Set the state of the player to menu
 
-            // Init the player to the menu and also confirm the connection
-            this.oos.writeObject(new Response2("Welcome to the game " + this.name, this.state));
+
+            this.oos.writeObject(new Response2("Welcome to the game " + this.name, this.state));  // Init the player to the menu and also confirm the connection
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -86,7 +92,7 @@ public class ServerClientThread extends Thread {
                 if (response != null) {
                     this.oos.writeObject(response);
 
-                    // If the client's state change, change the local state and print the commands
+                    // If the client's state change, change the local state and print the commands (normally it will never happen because the state change is done in the execute method)
                     if (response.getState() != this.state) {
                         this.setEtat(response.getState());
                         System.out.println(this.state.getClientInstruction());
@@ -94,16 +100,19 @@ public class ServerClientThread extends Thread {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace();  // Print the error if there is one
         } finally {
             try {
-                end();
+                end();  // Try to close all the streams and the socket of the client
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    /*
+        Method to close all the streams and the socket of the client
+     */
     public void end() throws IOException {
         if (this.playerAsked != null) {
             this.playerAsked.sendMessage("The invited player has left the game");
@@ -130,6 +139,9 @@ public class ServerClientThread extends Thread {
             this.games.remove(this.currentGame);
         }
 
+        /*
+            Close all the streams and the socket
+         */
         this.clientSocket.close();
         this.in.close();
         this.out.close();
@@ -150,6 +162,9 @@ public class ServerClientThread extends Thread {
         System.out.println("Player " + this.name + " disconnected");
     }
 
+    /*
+        Method to send a unified message to the client
+     */
     public void sendResponse(Response2 response) {
         try {
             this.oos.writeObject(response);
@@ -159,12 +174,18 @@ public class ServerClientThread extends Thread {
     }
 
 
+    /*
+        Method to send a message to all the players in the menu
+     */
     public void sendMessageGeneral(String message) {
         for (ServerClientThread sct : this.menuClients) {
             sct.sendMessage("General from " + this.name + ": " + message);
         }
     }
 
+    /*
+        Method to send a message to a specific player (never used but could be an improvement)
+     */
     public void sendMessageToOtherPlayer(String message,String receiver) {
         for (ServerClientThread sct : this.menuClients) {
             if (sct.name.equals(receiver)) {
@@ -172,6 +193,7 @@ public class ServerClientThread extends Thread {
             }
         }
     }
+
 
     public void sendMessage(String message) {
         try {
