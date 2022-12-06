@@ -5,9 +5,16 @@ import model.command.BaseCommand;
 import model.command.ChangeDifficultyCommand;
 import model.command.SendMessageToGeneral;
 
+/*
+    Class that represents the state of the game when the player is in the queue
+ */
 public class InQueue extends Etat {
 
-    private BaseCommand AskToPlay, AcceptToPlay, DeclineToPlay, QuitQueue, ShowPlayers;
+    private BaseCommand AskToPlay, AcceptToPlay, DeclineToPlay, QuitQueue, ShowPlayers;  // Commands that can be executed in this state
+
+    /**
+     * Constructor of the class
+     */
     public InQueue() {
         super();
         this.AskToPlay = new AskToPlay(this.quitCommand);

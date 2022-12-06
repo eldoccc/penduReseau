@@ -5,13 +5,22 @@ import model.command.GuessWordCommand;
 import model.command.SendLetterCommand;
 import model.command.SendMessageToOtherPlayerCommand;
 
+/*
+    Class that represents the state of the game when the player is in the game
+ */
 public class InGame extends Etat {
 
+    /*
+    Commands that can be executed in this state
+     */
     private BaseCommand sendLetterCommand;
     private BaseCommand sendMessageToOtherPlayerCommand;
     private BaseCommand guessWordCommand;
 
 
+    /**
+     * Constructor of the class according to the role of the player
+     */
     public InGame(boolean isGuesser) {
         super();
         if (isGuesser) {
@@ -26,7 +35,7 @@ public class InGame extends Etat {
 
     @Override
     public String getClientInstruction() {
-        return "Vous êtes en jeu ! Commandes :\n" +
+        return "You are in game ! Commandes :\n" +
                 this.command_available.toString();
     }
 

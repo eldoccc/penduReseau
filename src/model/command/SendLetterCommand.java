@@ -1,12 +1,15 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 import model.game.Game;
 import model.game.MultiplayerGame;
 
+/**
+ * This class is the command that try a letter
+ */
 public class SendLetterCommand extends BaseCommand{
 
-    private static final String SEND = "try";
+    private static final String SEND = "try";  // The command name
     public SendLetterCommand(Command next) {
         super(next);
         this.command_name = SEND;
@@ -28,20 +31,20 @@ public class SendLetterCommand extends BaseCommand{
     }
 
     @Override
-    public Response2 run() {
-        Game g = this.client.getGame();
-        switch (g.playLetter(this.args[0])){
-            case ALREADY_PLAYED -> {
+    public Response run() {
+        Game g = this.client.getGame();  // Get the game of the player
+        switch (g.playLetter(this.args[0])){  // Try the letter
+            case ALREADY_PLAYED -> {  // If the letter is already played
                 if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The letter " + this.args[0] + " has already been played\n" + g);
-                return new Response2("You have already played this letter !\n" + this.client.getGame(), this.client.getEtat());
+                return new Response("You have already played this letter !\n" + this.client.getGame(), this.client.getEtat());
             }
-            case RIGHT -> {
+            case RIGHT -> {  // If the letter is right
                 if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The letter " + this.args[0] + " is in the word\n" + g);
-                return new Response2("You have found a letter !\n" + this.client.getGame(), this.client.getEtat());
+                return new Response("You have found a letter !\n" + this.client.getGame(), this.client.getEtat());
             }
-            case WRONG -> {
+            case WRONG -> {  // If the letter is wrong
                 if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The letter " + this.args[0] + " is not in the word\n" + g);
-                return new Response2("You haven't found a letter !\n" + this.client.getGame(), this.client.getEtat());
+                return new Response("You haven't found a letter !\n" + this.client.getGame(), this.client.getEtat());
             }
         }
         return null;

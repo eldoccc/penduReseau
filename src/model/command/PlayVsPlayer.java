@@ -1,10 +1,12 @@
 package model.command;
 
-import model.Response2;
-import server.ServerClientThread;
+import model.Response;
 
+/**
+ * This class is the command to join the queue
+ */
 public class PlayVsPlayer extends BaseCommand {
-    private static final String COMMAND = "pvp";
+    private static final String COMMAND = "pvp";  // The command name
 
     public PlayVsPlayer(String command, String[] args) {
         super(command, args);
@@ -31,16 +33,16 @@ public class PlayVsPlayer extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        this.client.setGuesser(Boolean.parseBoolean(this.args[0]));
-        this.client.joinQueue();
+    public Response run() {
+        this.client.setGuesser(Boolean.parseBoolean(this.args[0]));  // Set the player as guesser or master depending on the argument
+        this.client.joinQueue();  // Join the queue
 
-        return new Response2(("You joined the queue" + "\n" + "Players available :\n" + this.printPlayers(this.getAvailablePlayers())), this.client.getEtat());
+        return new Response(("You joined the queue" + "\n" + "Players available :\n" + this.printPlayers(this.getAvailablePlayers())), this.client.getEtat());
     }
 
     @Override
     public String isValid() {
-        // Check if the argument is a boolean
+        // Check if the argument is a boolean (true or false <=> guesser or decider)
         if (this.args.length != 1) {
             return "Invalid number of arguments";
         }

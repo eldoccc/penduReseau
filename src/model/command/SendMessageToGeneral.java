@@ -1,9 +1,12 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 
+/**
+ * This class is the command to send a message to the general chat (only in the menu)
+ */
 public class SendMessageToGeneral extends BaseCommand {
-    private static final String COMMAND = "msg";
+    private static final String COMMAND = "msg";  // The command name
 
     public SendMessageToGeneral(String command, String[] args) {
         super(command, args);
@@ -31,8 +34,8 @@ public class SendMessageToGeneral extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        this.client.sendMessageGeneral(this.getArgsAsString());
+    public Response run() {
+        this.client.sendMessageGeneral(this.getArgsAsString());  // Send the message to the general chat
         return null;
     }
 

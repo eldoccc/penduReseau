@@ -1,9 +1,12 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 
+/**
+ * This class is the command to change the difficulty of the game
+ */
 public class ChangeDifficultyCommand extends BaseCommand {
-    private static final String COMMAND = "diff";
+    private static final String COMMAND = "diff";  // The command name
 
     public ChangeDifficultyCommand(String command, String[] args) {
         super(command, args);
@@ -30,9 +33,9 @@ public class ChangeDifficultyCommand extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        this.client.setDifficulty(Integer.parseInt(this.args[0]));
-        return new Response2("Difficulty changed to " + this.args[0], this.client.getEtat());
+    public Response run() {
+        this.client.setDifficulty(Integer.parseInt(this.args[0]));  // Set the difficulty of the game
+        return new Response("Difficulty changed to " + this.args[0], this.client.getEtat());  // Send a confirmation to the player
     }
 
     @Override

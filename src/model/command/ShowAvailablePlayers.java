@@ -1,9 +1,12 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 
+/**
+ * This class is the command to show the available players in the queue
+ */
 public class ShowAvailablePlayers extends BaseCommand {
-    private static final String COMMAND = "players";
+    private static final String COMMAND = "players";  // The command name
 
     public ShowAvailablePlayers(String command, String[] args) {
         super(command, args);
@@ -30,8 +33,8 @@ public class ShowAvailablePlayers extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        return new Response2("Players available :\n" + this.printPlayers(this.getAvailablePlayers()), this.client.getEtat());
+    public Response run() {
+        return new Response("Players available :\n" + this.printPlayers(this.getAvailablePlayers()), this.client.getEtat());  // Print the list of available players
     }
 
     @Override

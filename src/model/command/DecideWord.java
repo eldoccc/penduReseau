@@ -1,13 +1,16 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 import model.game.Game;
 import model.game.MultiplayerGame;
 import model.states.InGame;
 import server.ServerClientThread;
 
+/**
+ * This class is the command that decides the word of the multiplayer game
+ */
 public class DecideWord extends BaseCommand {
-    private static final String COMMAND = "decide";
+    private static final String COMMAND = "decide";  // The command name
 
     public DecideWord(String command, String[] args) {
         super(command, args);
@@ -34,9 +37,9 @@ public class DecideWord extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        ServerClientThread guesser = this.client.getPlayerAsked();
-        if (guesser != null) {
+    public Response run() {
+        ServerClientThread guesser = this.client.getPlayerAsked();  // Get the player that asked to play with
+        if (guesser != null) {  // If the player is not null (if he asked to play with) then start the game with the word
             this.client.setPlayerAsked(null);
             guesser.setPlayerAsked(null);
             Game g = new MultiplayerGame(this.args[0], guesser, this.client);
@@ -52,7 +55,7 @@ public class DecideWord extends BaseCommand {
             this.client.sendMessage("You have chosen a word, you can start playing !");
             guesser.setEtat(new InGame(true));
             guesser.sendMessage("You can start playing !\n" + g);
-            return new Response2("You have accepted the invitation to play", this.client.getEtat());
+            return new Response("You have accepted the invitation to play", this.client.getEtat());
         }
 
         return null;

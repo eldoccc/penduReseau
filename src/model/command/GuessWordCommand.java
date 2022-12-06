@@ -1,12 +1,15 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 import model.game.Game;
 import model.game.MultiplayerGame;
 
+/**
+ * This class is the command that guesses the word in a single try
+ */
 public class GuessWordCommand extends BaseCommand{
 
-    private static final String COMMAND = "guess";
+    private static final String COMMAND = "guess";  // The command name
 
     public GuessWordCommand(Command next) {
         super(next);
@@ -29,15 +32,15 @@ public class GuessWordCommand extends BaseCommand{
     }
 
     @Override
-    public Response2 run() {
-        Game g = this.client.getGame();
-        if(g.guessWord(this.args[0])){
+    public Response run() {
+        Game g = this.client.getGame();  // Get the game of the player
+        if(g.guessWord(this.args[0])){  // If the word is guessed then send a confirmation to all players
             if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The guesser guessed the word !\n" + g);
-            return new Response2("You have guessed the word !", this.client.getEtat());
+            return new Response("You have guessed the word !", this.client.getEtat());
         }
-        else {
+        else {  // Else send that the word is not guessed
             if (g instanceof MultiplayerGame) ((MultiplayerGame) g).getDecider().sendMessage("The guesser tried the word " + this.args[0] + "\n" + g);
-            return new Response2("You haven't managed to guess the word !", this.client.getEtat());
+            return new Response("You haven't managed to guess the word !", this.client.getEtat());
         }
     }
 

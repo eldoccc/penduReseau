@@ -1,9 +1,12 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 
+/**
+ * This class is the command to quit the queue
+ */
 public class QuitQueue extends BaseCommand {
-    private static final String COMMAND = "menu";
+    private static final String COMMAND = "menu";  // The command name
 
     public QuitQueue(String command, String[] args) {
         super(command, args);
@@ -30,10 +33,10 @@ public class QuitQueue extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        this.client.leaveQueue();
+    public Response run() {
+        this.client.leaveQueue();  // Leave the queue
 
-        return new Response2("You have left the queue", this.client.getEtat());
+        return new Response("You have left the queue", this.client.getEtat());
     }
 
     @Override

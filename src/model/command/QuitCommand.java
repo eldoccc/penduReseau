@@ -1,13 +1,15 @@
 package model.command;
 
-import model.Response2;
-import model.states.Etat;
+import model.Response;
 
 import java.io.IOException;
 
+/**
+ * This class is the command to quit the game
+ */
 public class QuitCommand extends BaseCommand {
-    private static final String COMMAND = "quit";
-    public static final String QUIT_COMMAND_PUBLIC = COMMAND;
+    private static final String COMMAND = "quit";  // The command name
+    public static final String QUIT_COMMAND_PUBLIC = COMMAND;  // The command name for the public (used in the client)
 
     public QuitCommand(String command, String[] args) {
         super(command, args);
@@ -34,14 +36,14 @@ public class QuitCommand extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
+    public Response run() {
         // Close all necessary things
         try {
             this.client.end();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new Response2("You have quit the game", this.client.getEtat());
+        return new Response("You have quit the game", this.client.getEtat());
     }
 
 

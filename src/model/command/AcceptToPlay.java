@@ -1,12 +1,14 @@
 package model.command;
 
-import model.Response2;
-import model.game.MultiplayerGame;
+import model.Response;
 import model.states.PreGame;
 import server.ServerClientThread;
 
+/**
+ * This class is the command to accept to play with another player
+ */
 public class AcceptToPlay extends BaseCommand {
-    private static final String COMMAND = "accept";
+    private static final String COMMAND = "accept";  // The command name
 
     public AcceptToPlay(String command, String[] args) {
         super(command, args);
@@ -33,24 +35,24 @@ public class AcceptToPlay extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
+    public Response run() {
         ServerClientThread playerAsked = this.client.getPlayerAsked();
         ServerClientThread guesser;
         ServerClientThread decider;
-        if (playerAsked != null) {
-            if (this.client.isGuesser()) {
+        if (playerAsked != null) {  // If the player has been invited
+            if (this.client.isGuesser()) {  // If the player is the guesser
                 guesser = this.client;
                 decider = playerAsked;
-            } else {
+            } else {  // If the player is the decider
                 guesser = playerAsked;
                 decider = this.client;
             }
-            decider.setEtat(new PreGame());
-            decider.sendMessage("You need to decide a word to guess");
-            guesser.sendMessage("The decider is choosing a word, please wait...");
+            decider.setEtat(new PreGame());  // Set the state of the decider to PreGame
+            decider.sendMessage("You need to decide a word to guess");  // Send a message to the decider
+            guesser.sendMessage("The decider is choosing a word, please wait...");  // Send a message to the guesser
 
 
-            return new Response2("You accept the invitation of " + this.client.getPlayerAsked().getPlayerName(), this.client.getEtat());
+            return new Response("You accept the invitation of " + this.client.getPlayerAsked().getPlayerName(), this.client.getEtat());  // Send a response to the player
         }
 
         return null;

@@ -1,26 +1,37 @@
 package model.command;
 
 
-import model.Response2;
-import model.states.Etat;
+import model.Response;
 import server.ServerClientThread;
 
 import java.util.ArrayList;
 
+/**
+ * This class is the base command class of the command pattern (it's a model of all the commands)
+ */
 public abstract class BaseCommand implements Command {
 
 
-    protected ServerClientThread client;
-    protected Command next;
-    protected String command;
-    protected String[] args;
-    protected String command_name;
+    protected ServerClientThread client;  // The client that sent the command
+    protected Command next;  // The next command (to transfer the command to the next handler)
+    protected String command;  // The command
+    protected String[] args;  // The arguments of the command
+    protected String command_name;  // The name of the command (first argument of the command)
 
+    /**
+     * Constructor of the base command class (never used)
+     * @param command The command
+     * @param args The arguments of the command
+     */
     public BaseCommand(String command, String[] args) {
         this.command = command;
         this.args = args;
     }
 
+    /**
+     * Constructor of the base command class
+     * @param next The next command (to transfer the command to the next handler)
+     */
     public BaseCommand(Command next) {
         this.next = next;
     }
@@ -34,11 +45,13 @@ public abstract class BaseCommand implements Command {
         return args.toString();
     }
 
+    // Get all available players (for play with)
     public ArrayList<ServerClientThread> getAvailablePlayers() {
         // Player is available if he is in the queue, if his isGuesser is different and if he is not in playerAsked
         return this.client.getPlayerInQueue().stream().filter(player -> player.isGuesser() != this.client.isGuesser() && player.getPlayerAsked() == null).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
+    // Methods to print all the available players to play with
     public String printPlayers(ArrayList<ServerClientThread> players) {
         StringBuilder playersString = new StringBuilder();
         for (ServerClientThread sct : players) {
@@ -56,8 +69,8 @@ public abstract class BaseCommand implements Command {
     }
 
 
-    // Execute the command
-    public Response2 execute(String command, ServerClientThread c) throws CommandException {
+    // Execute the command with all verification and return the response
+    public Response execute(String command, ServerClientThread c) throws CommandException {
         try {
             this.parse(command);
             this.client = c;

@@ -1,9 +1,8 @@
 package server;
 
+import model.Response;
 import model.command.CommandException;
 import model.game.Game;
-import model.Response2;
-import model.Wording;
 import model.game.MultiplayerGame;
 import model.states.Etat;
 import model.states.InQueue;
@@ -59,7 +58,7 @@ public class ServerClientThread extends Thread {
             this.setEtat(new Menu());  // Set the state of the player to menu
 
 
-            this.oos.writeObject(new Response2("Welcome to the game " + this.name, this.state));  // Init the player to the menu and also confirm the connection
+            this.oos.writeObject(new Response("Welcome to the game " + this.name, this.state));  // Init the player to the menu and also confirm the connection
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,16 +74,16 @@ public class ServerClientThread extends Thread {
 
                 // If the command is quit then quit the game
                 if (command.equals("quit")) {
-                    this.oos.writeObject(new Response2("Goodbye", this.state));
+                    this.oos.writeObject(new Response("Goodbye", this.state));
                     break;
                 }
 
                 // Execute the command
-                Response2 response;
+                Response response;
                 try {
                     response = this.state.execute(command, this);
                 } catch (CommandException e) {
-                    response = new Response2(e.getMessage(), this.state);
+                    response = new Response(e.getMessage(), this.state);
                 }
 
 
@@ -165,7 +164,7 @@ public class ServerClientThread extends Thread {
     /*
         Method to send a unified message to the client
      */
-    public void sendResponse(Response2 response) {
+    public void sendResponse(Response response) {
         try {
             this.oos.writeObject(response);
         } catch (IOException e) {
@@ -194,10 +193,12 @@ public class ServerClientThread extends Thread {
         }
     }
 
-
+    /*
+        Method to send a basic message to the client
+     */
     public void sendMessage(String message) {
         try {
-            this.oos.writeObject(new Response2(message, this.state));
+            this.oos.writeObject(new Response(message, this.state));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -215,30 +216,28 @@ public class ServerClientThread extends Thread {
     public boolean isGuesser() {
         return this.isGuesser;
     }
-
     public void setGuesser(boolean isGuesser) {
         this.isGuesser = isGuesser;
     }
-
     public String getPlayerName() {
         return this.name;
     }
-
     public void setEtat(Etat etat) {
         this.state = etat;
     }
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
     }
-
     public ArrayList<ServerClientThread> getPlayerInMenu() {
         return menuClients;
     }
-
     public ArrayList<ServerClientThread> getPlayerInQueue() {
         return this.queueClients;
     }
 
+    /*
+        Method to get the player in the queue with the name
+     */
     public ServerClientThread getPlayerByNameInQueue(String name) {
         for (ServerClientThread sct : this.queueClients) {
             if (sct.name.equals(name)) {
@@ -248,19 +247,9 @@ public class ServerClientThread extends Thread {
         return null;
     }
 
-    public void sendCustomMessageToAPlayer(String message, String playerName) {
-        for (ServerClientThread sct : this.menuClients) {
-            if (sct.name.equals(playerName)) {
-                sct.sendMessage(message);
-            }
-        }
-        for (ServerClientThread sct : this.queueClients) {
-            if (sct.name.equals(playerName)) {
-                sct.sendMessage(message);
-            }
-        }
-    }
-
+    /*
+        Method to join the queue
+     */
     public void joinQueue() {
         this.menuClients.remove(this);
         if (!this.queueClients.contains(this)) {
@@ -276,6 +265,9 @@ public class ServerClientThread extends Thread {
         }
     }
 
+    /*
+        Method to leave the queue
+     */
     public void leaveQueue() {
         this.queueClients.remove(this);
         this.menuClients.add(this);
@@ -308,10 +300,16 @@ public class ServerClientThread extends Thread {
         return this.difficulty;
     }
 
+    /*
+    Method to leave the menu
+     */
     public void leaveMenu() {
         this.menuClients.remove(this);
     }
 
+    /*
+        Method to join the menu
+     */
     public void joinMenu() {
         if (!this.menuClients.contains(this)) {
             this.menuClients.add(this);

@@ -5,12 +5,22 @@ import model.command.RestartCommand;
 import model.command.ReturnToMenuCommand;
 import model.command.SendMessageToOtherPlayerCommand;
 
+/**
+ * Class representing the end game state.
+ */
 public class EndGame extends Etat {
 
+    /*
+      Commands available in this state.
+     */
     private BaseCommand restartCommand;
     private BaseCommand returnToMenuCommand;
     private BaseCommand sendMessageToOtherPlayerCommand;
 
+
+    /**
+     * Constructor of the class.
+     */
     public EndGame() {
         super();
         this.restartCommand = new RestartCommand(this.quitCommand);
@@ -23,14 +33,6 @@ public class EndGame extends Etat {
     public String getClientInstruction() {
         return "You are in the end game ! Commands :\n" +
                 this.command_available.toString();
-
-        /*if(win){
-            return "Vous avez gagné en devinant le mot " + getSecretWord() + ", Commandes disponibles :\n" +
-                    this.command_available.toString();
-        } else {
-            return "Vous avez perdu, le mot était " + getSecretWord() + ", Commandes disponibles:\n" +
-                    this.command_available.toString();
-        }*/
     }
 
     @Override

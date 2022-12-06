@@ -1,14 +1,22 @@
 package client;
 
-import model.Response;
 import model.command.QuitCommand;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Objects;
 
+/**
+ * This class is the client of the game
+ */
 public class Client {
 
+    /**
+     * The main method of the client
+     * @param args The arguments of the main method (the ip address and the port)
+     * @throws IOException If there is an error with the input or the output
+     * @throws ClassNotFoundException If there is an error with the class
+     */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Socket clientSocket;
         BufferedReader in_keyboard;
@@ -35,7 +43,7 @@ public class Client {
         String command = "";
         while (!Objects.equals(command, QuitCommand.QUIT_COMMAND_PUBLIC)) {
             command = in_keyboard.readLine();
-            clientThread.send(command);
+            clientThread.send(command);  // Send the command to the server
         }
 
         clientThread.end();

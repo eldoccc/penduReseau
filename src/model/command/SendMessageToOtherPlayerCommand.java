@@ -1,8 +1,11 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 import model.game.MultiplayerGame;
 
+/**
+ * This class is the command to send a message to the other player (only in the multiplayer game)
+ */
 public class SendMessageToOtherPlayerCommand extends BaseCommand{
 
     private static final String MESSAGE = "chat";
@@ -29,7 +32,7 @@ public class SendMessageToOtherPlayerCommand extends BaseCommand{
 
 
     @Override
-    public Response2 run() {
+    public Response run() {
         // If the player is in a multiplayer game send the message to the other player
         if (this.client.getGame() instanceof MultiplayerGame) {
             MultiplayerGame game = (MultiplayerGame) this.client.getGame();

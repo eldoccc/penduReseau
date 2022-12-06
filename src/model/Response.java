@@ -1,47 +1,34 @@
 package model;
 
+import model.states.Etat;
+
 import java.io.Serializable;
 
+/*
+    Response class used to send a response to the client with the same structure
+ */
 public class Response implements Serializable {
-    private int triesLeft;
-    private String hiddenWord;
-    private int stateGame;     /*
-     0 = already use
-     1 = letter match
-     2 = lose
-     3 = win
-     4 = letter not match
-    */
+    private String message;  // Additional message to send to the client
+    private Etat state;  // State of the player in the game
 
-    public Response(int triesLeft, String hiddenWord, int stateGame) {
-        this.triesLeft = triesLeft;
-        this.hiddenWord = hiddenWord;
-        this.stateGame = stateGame;
+    /*
+        Constructor of the Response class
+     */
+    public Response(String message, Etat state) {
+        this.message = message;
+        this.state = state;
     }
 
-    public int getTriesLeft() {
-        return triesLeft;
+    public String getMessage() {
+        return message;
     }
 
-    public void setTriesLeft(int triesLeft) {
-        this.triesLeft = triesLeft;
+    public Etat getState() {
+        return state;
     }
 
-    public String getHiddenWord() {
-        return hiddenWord;
+    @Override
+    public String toString() {
+        return message;
     }
-
-    public void setHiddenWord(String hiddenWord) {
-        this.hiddenWord = hiddenWord;
-    }
-
-    public int getStateGame() {
-        return stateGame;
-    }
-
-    public void setStateGame(int stateGame) {
-        this.stateGame = stateGame;
-    }
-
-
 }

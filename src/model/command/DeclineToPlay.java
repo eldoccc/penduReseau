@@ -1,9 +1,12 @@
 package model.command;
 
-import model.Response2;
+import model.Response;
 
+/**
+ * This class is the command to decline to play with a player
+ */
 public class DeclineToPlay extends BaseCommand {
-    private static final String COMMAND = "decline";
+    private static final String COMMAND = "decline";  // The command name
 
     public DeclineToPlay(String command, String[] args) {
         super(command, args);
@@ -30,8 +33,8 @@ public class DeclineToPlay extends BaseCommand {
     }
 
     @Override
-    public Response2 run() {
-        // Send the message to the playerAsked if there is one and remove the playerAsked
+    public Response run() {
+        // Send the message to the playerAsked if there is one and remove the playerAsked else send an error message (rejected by isValid)
         if (this.client.getPlayerAsked() != null) {
             if (this.args.length > 0) {
                 this.client.getPlayerAsked().sendMessage(this.client.getPlayerName() + " a refusé votre invitation : " + this.getArgsAsString());
@@ -42,9 +45,9 @@ public class DeclineToPlay extends BaseCommand {
             String tmpName = this.client.getPlayerAsked().getPlayerName();
             this.client.getPlayerAsked().setPlayerAsked(null);
             this.client.setPlayerAsked(null);
-            return new Response2("Vous avez refusé l'invitation de " + tmpName, this.client.getEtat());
+            return new Response("Vous avez refusé l'invitation de " + tmpName, this.client.getEtat());
         } else {
-            return new Response2("Vous n'avez pas été invité à jouer", this.client.getEtat());
+            return new Response("Vous n'avez pas été invité à jouer", this.client.getEtat());
         }
     }
 

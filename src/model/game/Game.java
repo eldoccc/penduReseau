@@ -9,21 +9,27 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Handler;
 
+/*
+    * This class is the main class of the game. It contains the game logic and the game state.
+ */
 public abstract class Game {
-    private String secretWord;
-    private int tries;
-    private int duration;
-    private long startTime;
-    private ArrayList<String> rightPlayedLetters;
-    private ArrayList<String> wrongPlayedLetters;
-    private ServerClientThread joueur1;
-    private boolean lose;
-    private Timer timer;
+    private String secretWord;  // The secret word of the game
+    private int tries;  // The number of tries the player has
+    private int duration;  // The duration of the game
+    private long startTime;  // The start time of the game
+    private ArrayList<String> rightPlayedLetters;  // The letters that the player has played right
+    private ArrayList<String> wrongPlayedLetters;  // The letters that the player has played wrong
+    private ServerClientThread joueur1;  // The first player
+    private boolean lose;  // If the player has lost
+    private Timer timer;  // The timer of the game
 
-    public static enum letterPlayed {
+    public static enum letterPlayed {  // The enum of the letter played
         RIGHT, WRONG, ALREADY_PLAYED
     }
 
+    /**
+     * Constructor of the game class with the secret word, the number of tries and the duration of the game
+     */
     public Game(String secretWord, ServerClientThread joueur1) {
         this.secretWord = secretWord.toLowerCase();
         this.setDifficulty(joueur1.getDifficulty());
@@ -42,6 +48,11 @@ public abstract class Game {
     }
 
 
+    /**
+     * This method is called when the player plays a letter
+     * @param letter The letter played
+     * @return The enum of the letter played
+     */
     public letterPlayed playLetter(String letter) {
         letter = letter.toLowerCase();
         if (rightPlayedLetters.contains(letter) || wrongPlayedLetters.contains(letter)) {
@@ -61,6 +72,10 @@ public abstract class Game {
         return letterPlayed.RIGHT;
     }
 
+    /**
+     * This method is called when the player plays a word to print the letters of the word
+     * @return the word with his right letters
+     */
     public String generateWordWithLettersFound() {
         String word = "";
         if (lose) {
@@ -139,6 +154,9 @@ public abstract class Game {
         return this.wrongPlayedLetters.size();
     }
 
+    /*
+    Set the difficulty of the game
+     */
     public void setDifficulty(int difficulty){
         switch (difficulty) {
             case 2 :
@@ -157,11 +175,20 @@ public abstract class Game {
         }
     }
 
+    /**
+     * Check if the player has won the game
+     * @param word The word played
+     * @return If the player has won
+     */
     public boolean checkWin(String word){
         if (word.equals("LETTER_TRIED")) return generateWordWithLettersFound().equals(secretWord);
         else return word.equals(secretWord);
     }
 
+    /**
+     * Method to try a word to guess the secret word
+     * @param arg The tryed word
+     */
     public boolean guessWord(String arg) {
         if (checkWin(arg)) {
             this.timer.cancel();
@@ -175,11 +202,18 @@ public abstract class Game {
         }
     }
 
+    /**
+     * Method to remove a try
+     * @param letter The letter played
+     */
     public void removeTry(String letter) {
         this.wrongPlayedLetters.add(letter);
         checkLose();
     }
 
+    /**
+     * Method to check if the player has lost
+     */
     private void checkLose() {
         if (this.tries == wrongPlayedLetters.size()) {
             this.timer.cancel();
@@ -188,11 +222,18 @@ public abstract class Game {
         }
     }
 
+    /**
+     * Method to get the remaining time
+     * @return The remaining time
+     */
     private int getReamingTime() {
         return (int) (this.duration - (System.currentTimeMillis() - this.startTime) / 1000);
     }
 
 
+    /**
+     * Method to stop the timer
+     */
     public void stop() {
         this.timer.cancel();
     }

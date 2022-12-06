@@ -2,10 +2,16 @@ package model.states;
 
 import model.command.*;
 
+/*
+    Class Menu : state of the game when the player is in the menu
+ */
 public class Menu extends Etat {
 
-    private BaseCommand changeDifficultyCommand, sendMessageGeneral, playCommand, pvpCommand;
+    private BaseCommand changeDifficultyCommand, sendMessageGeneral, playCommand, pvpCommand;  // Cammands available in the menu
 
+    /**
+     * Constructor of the Menu state
+     */
     public Menu() {
         super();
         this.sendMessageGeneral = new SendMessageToGeneral(this.quitCommand);
