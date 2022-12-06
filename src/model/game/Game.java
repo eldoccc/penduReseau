@@ -218,6 +218,7 @@ public abstract class Game {
         if (this.tries == wrongPlayedLetters.size()) {
             this.timer.cancel();
             joueur1.sendMessage("You lose...");
+            this.lose = true;
             joueur1.setEtat(new EndGame());
         }
     }
